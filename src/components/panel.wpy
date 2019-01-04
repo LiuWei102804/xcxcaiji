@@ -1,0 +1,28 @@
+<style lang="less">
+    .panel {
+        width: 100%;
+        margin-top: 20rpx;
+        text-align: left;
+        font-size: 14px;
+        padding-top: 20rpx;
+        padding-left: 50rpx;
+        padding-bottom: 20rpx;
+        border-bottom: 1px solid #ddd;
+        font-weight: bold;
+        background: #fff;
+    }
+</style>
+<template>
+  <view class="panel">{{ title }}</view>
+</template>
+<script>
+  import wepy from 'wepy'
+
+  export default class Panel extends wepy.component {
+      props = {
+          title : String
+      }
+      onLoad() {
+      }
+  }
+</script>

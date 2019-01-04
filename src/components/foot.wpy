@@ -1,0 +1,59 @@
+<style lang="less">
+    .footer{
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        height: 45px;
+        font-size: 13px;
+        width: 100%;
+        border-top: 1px solid #ccc;
+        background: #fff;
+        z-index: 999;
+        .footer_item{
+            flex-direction: column;
+            -webkit-flex-direction: column;
+            flex: 1;
+            -webkit-flex: 1;
+            text-align: center;
+            font-size: 10px;
+            i{ font-size: 18px; }
+        }
+        .active{
+            color: #478c1e;
+        }
+    }
+</style>
+<template>
+    <view class="footer flex flex_just flex_align">
+        <repeat for="{{navBtns}}" item="item" index="index">
+            <a @tap="tabComponent({{ index }})" class="flex footer_item {{ item.active }}">
+                <i class="{{item.icon}}"></i>
+                {{ item.text }}
+            </a>
+        </repeat>
+    </view>
+</template>
+<script>
+    import wepy from "wepy";
+
+    export default class Foot extends wepy.component {
+        data = {
+            oldActive : 0 ,
+            navBtns : [
+                { text : "首页" , icon : "fa fa-home" , active : "active" } ,
+                { text : "购物车" , icon : "fa fa-cart-plus" , active : "" } ,
+                { text : "我的" , icon : "fa fa-user-o" , active : "" }
+            ]
+        }
+        methods = {
+            tabComponent( index ){
+                this.navBtns[this.oldActive].active = "";
+                this.navBtns[index].active = "active";
+                this.oldActive = index;
+                this.$emit( "tab", index );
+            }
+        }
+        onLoad(){
+        }
+    }
+</script>

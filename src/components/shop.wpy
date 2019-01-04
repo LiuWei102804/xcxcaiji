@@ -1,0 +1,87 @@
+<style lang="less">
+    .shop-data{
+        padding: 10px 5%;
+        position: relative;
+        margin-top: 5px;
+        background: #fff;
+        .shop-item{
+            width: 100%;
+            height: 50px;
+            .checkbox{ font-size: 20px; flex: 1; -webkit-flex: 1; }
+            image{ width: 50px; height:50px;}
+            .fa-check-circle{ color: #478c1e; }
+            .shop-info{
+                flex: 7; -webkit-flex: 7; font-size: 12px; flex-direction: column; -webkit-flex-direction: column; height: 100%; padding: 0 10px; position: relative;
+                p{
+                    overflow: hidden;
+                    max-width: 100%;
+                    text-overflow: ellipsis;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    color: #999;
+                }
+                .price{ position: absolute; bottom: 0; color: red;
+                    text{ font-size: 14px; }
+                }
+            }
+        }
+    }
+    .shop-balance{
+        position: fixed;
+        bottom: 45px;
+        left: 0;
+        width: 100%;
+        height: 40px;
+        background: #fff;
+        padding: 0 5%;
+        font-size: 12px;
+        label{
+            .checkbox{ font-size: 20px; }
+        }
+        a{ font-size: 12px; position: absolute; right: 9%; top: 0; border: none; height: 100%; width: 30%; padding: 0; text-align: center; line-height: 40px; background: #478c1e; color: #fff; }
+
+    }
+    /* fa-circle-thin  */
+</style>
+<template>
+    <view class="content">
+        <view class="shop-data">
+            <label class="shop-item flex flex_align">
+                <i class="checkbox fa fa-check-circle"></i>
+                <image src="../images/yu.jpg"></image>
+                <view class="shop-info flex">
+                    <p>新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜</p>
+                    <text class="price">￥<text>12.8</text></text>
+                </view>
+            </label>
+        </view>
+        <view class="shop-data">
+            <label class="shop-item flex flex_align">
+                <i class="checkbox fa fa-check-circle"></i>
+                <image src="../images/yu.jpg"></image>
+                <view class="shop-info flex">
+                    <p>新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜</p>
+                    <text class="price">￥<text>12.8</text></text>
+                </view>
+            </label>
+        </view>
+        <view class="shop-balance flex flex_align">
+            <label>
+                <i class="checkbox fa fa-circle-thin"></i>
+                全选
+            </label>
+            <text>合:138.90</text>
+            <a>结算</a>
+        </view>
+    </view>
+
+</template>
+<script>
+    import wepy from "wepy";
+
+    export default class Shop extends wepy.component {
+
+    }
+</script>

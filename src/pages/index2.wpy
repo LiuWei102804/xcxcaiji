@@ -1,0 +1,51 @@
+<style lang="less">
+    @import "../static/font-awesome";
+    @import "../static/flex";
+
+    page{ height: 100%; overflow: hidden; }
+    .tab{ height: calc(100% - 45px); overflow: auto; overflow-x: hidden; background: #eee;  }
+</style>
+<template>
+    <view class="tab">
+        <home wx:if="{{ tabActive == 0 }}"></home>
+        <shop wx:if="{{ tabActive == 1 }}"></shop>
+        <user wx:if="{{ tabActive == 2 }}"></user>
+    </view>
+    <foot></foot>
+</template>
+<script>
+    import wepy from "wepy";
+    import Home from "../components/home";
+    import User from "../components/user";
+    import Shop from "../components/shop";
+    import Foot from "../components/foot";
+
+    export default class Index2 extends wepy.page {
+        constructor(){
+            super();
+        }
+        components = {
+            home : Home ,
+            shop : Shop ,
+            user : User ,
+            foot : Foot
+        }
+        data = {
+            tabActive : 0
+        }
+        methods = {
+
+        }
+        events = {
+            "tab" : ( index ) => {
+                this.tabActive = index;
+            }
+        }
+        onLoad(params, data) {
+            // let self = this;
+            // this.$parent.getUserInfo(function ( userInfo ) {
+            //     console.log( 1111, userInfo )
+            // })
+        }
+    }
+</script>
