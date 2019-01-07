@@ -55,6 +55,10 @@
                 <text>足迹</text>
                 <i class="fa fa-angle-right"></i>
             </label>
+            <label>
+                <text>仓库</text>
+                <i class="fa fa-angle-right"></i>
+            </label>
         </view>
     </view>
 

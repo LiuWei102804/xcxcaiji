@@ -3,7 +3,7 @@
     @import "../static/flex";
 
     page{ height: 100%; overflow: hidden; }
-    .tab{ height: calc(100% - 45px); overflow: auto; overflow-x: hidden; background: #eee;  }
+    .tab{ height: calc(100% - 46px); overflow: auto; overflow-x: hidden; background: #eee; position: relative; }
 </style>
 <template>
     <view class="tab">
@@ -19,6 +19,7 @@
     import User from "../components/user";
     import Shop from "../components/shop";
     import Foot from "../components/foot";
+    import { WINHEIGHT , RPX } from "../util/info";
 
     export default class Index2 extends wepy.page {
         constructor(){
@@ -31,7 +32,8 @@
             foot : Foot
         }
         data = {
-            tabActive : 0
+            tabActive : 0 ,
+            scrollHeight : 0
         }
         methods = {
 
@@ -42,6 +44,7 @@
             }
         }
         onLoad(params, data) {
+            //this.scrollHeight = WINHEIGHT;
             // let self = this;
             // this.$parent.getUserInfo(function ( userInfo ) {
             //     console.log( 1111, userInfo )

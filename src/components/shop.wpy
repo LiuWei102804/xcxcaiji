@@ -1,13 +1,14 @@
 <style lang="less">
     .shop-data{
-        padding: 10px 5%;
+        padding: 10px 2%;
         position: relative;
         margin-top: 5px;
         background: #fff;
+        width: 96%;
         .shop-item{
             width: 100%;
-            height: 50px;
-            .checkbox{ font-size: 20px; flex: 1; -webkit-flex: 1; }
+            height: 60px;
+            .checkbox{ font-size: 20px; flex: 1; -webkit-flex: 1; color: #478c1e; }
             image{ width: 50px; height:50px;}
             .fa-check-circle{ color: #478c1e; }
             .shop-info{
@@ -32,56 +33,149 @@
         position: fixed;
         bottom: 45px;
         left: 0;
-        width: 100%;
+        width: 96%;
         height: 40px;
         background: #fff;
-        padding: 0 5%;
+        padding: 0 0 0 4%;
         font-size: 12px;
+        z-index: 9999;
         label{
-            .checkbox{ font-size: 20px; }
+            flex: 1;
+            -webkit-flex: 1;
+            .checkbox{ font-size: 20px; color: #478c1e; }
         }
-        a{ font-size: 12px; position: absolute; right: 9%; top: 0; border: none; height: 100%; width: 30%; padding: 0; text-align: center; line-height: 40px; background: #478c1e; color: #fff; }
+        a{ font-size: 12px; display: block; border: none; height: 100%; width: 45%; padding: 0; text-align: center; line-height: 40px; background: #478c1e; color: #fff; }
+        label:last-child{ justify-content: flex-end; -webkit-justify-content: flex-end;
+            text{ font-size: 16px; margin-right: 10px; color: #FF5722;
+                .small{ font-size: 13px; margin: 0; color: #000; }
+            }
+        }
 
     }
     /* fa-circle-thin  */
 </style>
 <template>
-    <view class="content">
-        <view class="shop-data">
-            <label class="shop-item flex flex_align">
-                <i class="checkbox fa fa-check-circle"></i>
-                <image src="../images/yu.jpg"></image>
-                <view class="shop-info flex">
-                    <p>新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜</p>
-                    <text class="price">￥<text>12.8</text></text>
-                </view>
-            </label>
-        </view>
-        <view class="shop-data">
-            <label class="shop-item flex flex_align">
-                <i class="checkbox fa fa-check-circle"></i>
-                <image src="../images/yu.jpg"></image>
-                <view class="shop-info flex">
-                    <p>新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜</p>
-                    <text class="price">￥<text>12.8</text></text>
-                </view>
-            </label>
-        </view>
+    <view class="content" style="padding-bottom: 40px">
+        <repeat for="{{ shopItems }}" item="item" index="index">
+            <view class="shop-data">
+                <label class="shop-item flex flex_align">
+                    <i class="checkbox fa {{ item.checked ? 'fa-check-circle' : 'fa-circle-thin' }}" @tap="checkItem({{ index }})"></i>
+                    <image src="{{ item.goodUrl }}"></image>
+                    <view class="shop-info flex">
+                        <p>{{ item.title }}</p>
+                        <text class="price">￥<text>{{ item.price }}</text></text>
+                    </view>
+                </label>
+            </view>
+        </repeat>
         <view class="shop-balance flex flex_align">
-            <label>
-                <i class="checkbox fa fa-circle-thin"></i>
+            <label style="flex: 1; -webkit-flex:1;">
+                <i class="checkbox fa {{ totalChecked ? 'fa-check-circle' : 'fa-circle-thin' }}" @tap="checkAll()"></i>
                 全选
             </label>
-            <text>合:138.90</text>
-            <a>结算</a>
+            <label class="flex flex_align" style="flex: 3; -webkit-flex:3;">
+                <text><text class="small">合:￥</text> {{ totalPrice }}</text>
+                <a>结算</a>
+            </label>
+
         </view>
     </view>
-
 </template>
 <script>
     import wepy from "wepy";
 
-    export default class Shop extends wepy.component {
 
+
+    export default class Shop extends wepy.component {
+        data = {
+            totalPrice : 0 ,
+            totalChecked : false ,
+            scrollHeight : 0 ,
+            checkNum : 0 ,
+            shopItems : [
+                {
+                    goodUrl : "../images/yu.jpg" ,
+                    title : "新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜" ,
+                    price : 12.8 ,
+                    checked : false
+                } ,
+                {
+                    goodUrl : "../images/yu.jpg" ,
+                    title : "layui 内置了七种背景色，以便你用于各种元素中，如：徽章、分割线、导航等等" ,
+                    price : 9.87 ,
+                    checked : false
+                } ,
+                {
+                    goodUrl : "../images/yu.jpg" ,
+                    title : "layui 内置了七种背景色，以便你用于各种元素中，如：徽章、分割线、导航等等" ,
+                    price : 9.87 ,
+                    checked : false
+                } ,
+                {
+                    goodUrl : "../images/yu.jpg" ,
+                    title : "layui 内置了七种背景色，以便你用于各种元素中，如：徽章、分割线、导航等等" ,
+                    price : 9.87 ,
+                    checked : false
+                } ,
+                {
+                    goodUrl : "../images/yu.jpg" ,
+                    title : "layui 内置了七种背景色，以便你用于各种元素中，如：徽章、分割线、导航等等" ,
+                    price : 9.87 ,
+                    checked : false
+                } ,
+                {
+                    goodUrl : "../images/yu.jpg" ,
+                    title : "layui 内置了七种背景色，以便你用于各种元素中，如：徽章、分割线、导航等等" ,
+                    price : 9.87 ,
+                    checked : false
+                } ,
+                {
+                    goodUrl : "../images/yu.jpg" ,
+                    title : "layui 内置了七种背景色，以便你用于各种元素中，如：徽章、分割线、导航等等" ,
+                    price : 9.87 ,
+                    checked : false
+                } ,
+                {
+                    goodUrl : "../images/yu.jpg" ,
+                    title : "layui 内置了七种背景色，以便你用于各种元素中，如：徽章、分割线、导航等等" ,
+                    price : 9.87 ,
+                    checked : false
+                }
+            ]
+        }
+        methods = {
+            checkItem( index ) {                //选中某一项
+                this.shopItems[index].checked = !this.shopItems[index].checked;
+
+                if( this.shopItems[index].checked ) {
+                    this.checkNum ++;
+                    this.totalPrice = Number( ( this.totalPrice + Number( this.shopItems[index].price ) ).toFixed(2) );
+                } else {
+                    this.checkNum --;
+                    this.totalPrice = Number( ( this.totalPrice - Number( this.shopItems[index].price ) ).toFixed(2) );
+                }
+                if( this.checkNum >= this.shopItems.length ) {
+                    this.totalChecked = true;
+                } else {
+                    this.totalChecked = false;
+                }
+            } ,
+            checkAll(){                         //选中所有
+                this.totalChecked = !this.totalChecked;
+                if( this.totalChecked ) {
+                    this.shopItems.forEach( ( item , index ) => {
+                        this.shopItems[index].checked = true;
+                        this.totalPrice = Number( ( this.totalPrice + Number( item.price ) ).toFixed(2) );
+                    })
+                    this.checkNum = this.shopItems.length;
+                } else {
+                    this.shopItems.forEach( ( item , index ) => {
+                        this.shopItems[index].checked = false;
+                    });
+                    this.totalPrice = 0;
+                    this.checkNum = 0;
+                }
+            }
+        }
     }
 </script>

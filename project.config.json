@@ -9,7 +9,7 @@
 	},
 	"compileType": "miniprogram",
 	"appid": "wxde66ed9e6259db5b",
-	"projectname": "project",
-	"miniprogramRoot": "./dist",
+	"projectname": "%E8%8F%9C%E9%B8%A1",
+	"miniprogramRoot": "dist/",
 	"condition": {}
 }

@@ -1,0 +1,101 @@
+<style lang="less">
+    @import "../static/flex";
+    @import "../static/font-awesome";
+
+    .page{
+        width: 100%; padding: 0 0%; height: auto; overflow-x: hidden; background: #eee;
+        .title{ line-height: 20px; height: 20px; display: block; margin-top: 10px; }
+        .desc{ font-size: 12px; color: #666; }
+        .good-name{ justify-content: space-between; -webkit-justify-content: space-between; background: #fff; padding: 0 2%; width: 96%; padding-bottom: 10px;
+            label{ flex: 5; -webkit-flex: 5; }
+            .price{ color: red; font-size: 12px; flex: 1; -webkit-flex: 1;
+                text{ font-size: 14px; }
+            }
+            .add{ font-size: 24px; color: #666; flex: 1; -webkit-flex: 1; text-align: right; }
+        }
+        .user{ font-size: 12px; color: #666; background: #fff; display: block; width: 96%; padding: 10px 2%;
+            i{ margin-right: 5px; }
+        }
+
+        .more{ margin-top: 10px; background: #fff; padding: 10px 2%;
+            .has{  line-height: 36px; display: block; width: 100%; border-bottom: 1px solid #ccc; }
+            .other{
+                padding: 10px 0%; width: 100%; height: auto; overflow: hidden;
+                label{
+                    width: 46%; height: auto; display: block; float: left; padding: 5px 2%; margin-bottom: 10px;
+                    image{ width: 100%; height:300rpx; }
+                    .name{ font-size: 12px; color: #666; line-height: 16px; }
+                    .price{ color: red; font-size: 12px; justify-content: space-between; -webkit-justify-content: space-between;
+                        text{ font-size: 14px;  }
+                        .add{ color: #666; font-size: 16px; }
+                    }
+                }
+            }
+        }
+    }
+</style>
+<template>
+    <swiper indicator-dots="true" autoplay="true" interval="3000" duration="600" circular="true">
+        <repeat for="{{ imgUrls }}" item="item" key="index">
+            <block>
+                <swiper-item style="width: 100%; height: 100%; overflow: hidden;">
+                    <navigator url="{{item.link}}" hover-class="navigator-hover">
+                        <image src="{{item.url}}" class="slide-image" style="width: 100%; height: 150px;" />
+                    </navigator>
+                </swiper-item>
+            </block>
+        </repeat>
+    </swiper>
+    <view class="page">
+        <label class="flex flex_align good-name">
+            <label>
+                <h3 class="title">湿海带结 250g</h3>
+                <p class="desc">这是描述描述</p>
+            </label>
+            <p class="price">￥<text>11.38</text></p>
+            <a class="add"><i class="fa fa-cart-plus"></i></a>
+        </label>
+        <a class="user"><i class="fa fa-user-circle"></i>huangjiji 发表于2小时前</a>
+
+        <view class="more">
+            <text class="has">该用户还有</text>
+            <view class="other">
+                <repeat for="{{ otherData }}" item="item">
+                    <label>
+                        <image src="{{ item.goodUrl }}"></image>
+                        <text class="name">{{ item.name }}</text>
+                        <p class="price flex flex_align">
+                            <a>￥<text>{{ item.price }}</text></a>
+                            <a class="add"><i class="fa fa-cart-plus"></i></a>
+                        </p>
+                    </label>
+                </repeat>
+            </view>
+        </view>
+    </view>
+</template>
+<script>
+    import wepy from "wepy";
+
+    export default class Good extends wepy.page{
+        // constructor(){
+        //     super();
+        // }
+        data = {
+            imgUrls : [
+                { link : "" , url : "../images/n1.jpg"} ,
+                { link : "" , url : "../images/n2.jpg"} ,
+                { link : "" , url : "../images/n3.jpg"}
+            ] ,
+            otherData : [
+                { goodUrl : "../images/n1.jpg" , name : "黄瓜白菜胡萝卜" , price : 13.18 } ,
+                { goodUrl : "../images/n2.jpg" , name : "黄瓜白菜胡萝卜" , price : 15.3 } ,
+                { goodUrl : "../images/n3.jpg" , name : "一小撮小葱" , price : 2.3 } ,
+                { goodUrl : "../images/n1.jpg" , name : "新鲜猪肉 300g" , price : 8.8 }
+            ]
+        }
+        onLoad( option ){
+            console.log( option.id )
+        }
+    }
+</script>
