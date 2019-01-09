@@ -49,7 +49,7 @@
     <view class="page">
         <label class="flex flex_align good-name">
             <label>
-                <h3 class="title">湿海带结 250g</h3>
+                <h3 class="title">Apple iPhone XS Max (A2104) 256GB 深空灰色 移动联通电信4G手机 双卡双待</h3>
                 <p class="desc">这是描述描述</p>
             </label>
             <p class="price">￥<text>11.38</text></p>
@@ -83,15 +83,15 @@
         // }
         data = {
             imgUrls : [
-                { link : "" , url : "../images/n1.jpg"} ,
-                { link : "" , url : "../images/n2.jpg"} ,
-                { link : "" , url : "../images/n3.jpg"}
+                { link : "" , url : "../images/yu1.jpg"} ,
+                { link : "" , url : "../images/yu2.jpg"} ,
+                { link : "" , url : "../images/yu3.jpg"}
             ] ,
             otherData : [
-                { goodUrl : "../images/n1.jpg" , name : "黄瓜白菜胡萝卜" , price : 13.18 } ,
-                { goodUrl : "../images/n2.jpg" , name : "黄瓜白菜胡萝卜" , price : 15.3 } ,
-                { goodUrl : "../images/n3.jpg" , name : "一小撮小葱" , price : 2.3 } ,
-                { goodUrl : "../images/n1.jpg" , name : "新鲜猪肉 300g" , price : 8.8 }
+                { price : 10999.00 , long : "100m" , author : "黄贱贱2元店" , name : "Apple iPhone XS Max (A2104) 256GB 深空灰色 移动联通电信4G手机 双卡双待" , goodUrl : "../images/yu.jpg" } ,
+                { price : 2798.00 , long : "100m" , author : "黄贱贱2元店" , name : "vivo X23全息幻彩版 6GB+128GB 北极晨曦 水滴屏全面屏 游戏手机 移动联通电信全网通4G手机" , goodUrl : "../images/yu2.jpg" } ,
+                { price : 2199.00 , long : "300m" , author : "黄贱贱2元店" , name : "荣耀10 GT游戏加速 AIS手持夜景 6GB+64GB 幻夜黑 全网通 移动联通电信4G 双卡双待 游戏手机" , goodUrl : "../images/yu3.jpg" } ,
+                { price : 2949.00 , long : "800m" , author : "造船的小店" , name : "一加手机6 8GB+128GB 亮瓷黑 高通骁龙845 全面屏双摄游戏手机 全网通4G 双卡双待" , goodUrl : "../images/yu4.jpg" }
             ]
         }
         onLoad( option ){
