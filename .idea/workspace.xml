@@ -63,8 +63,8 @@
       <file leaf-file-name="good.wpy" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/pages/good.wpy">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="53">
-              <caret line="51" column="88" selection-start-line="51" selection-start-column="88" selection-end-line="51" selection-end-column="88" />
+            <state relative-caret-position="88">
+              <caret line="4" column="10" lean-forward="true" selection-start-line="4" selection-start-column="10" selection-end-line="4" selection-end-column="10" />
               <folding>
                 <element signature="n#style#0;n#image#0;n#navigator#0;n#swiper-item#0;n#block#0;n#repeat#0;n#swiper#0;n#template#0;n#!!top" expanded="true" />
               </folding>
@@ -255,12 +255,12 @@
       <updated>1546823445380</updated>
       <workItem from="1546823449909" duration="2703000" />
       <workItem from="1546826741931" duration="18351000" />
-      <workItem from="1547016307588" duration="10627000" />
+      <workItem from="1547016307588" duration="10767000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="31681000" />
+    <option name="totallyTimeSpent" value="31821000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
@@ -527,8 +527,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/pages/good.wpy">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="53">
-          <caret line="51" column="88" selection-start-line="51" selection-start-column="88" selection-end-line="51" selection-end-column="88" />
+        <state relative-caret-position="88">
+          <caret line="4" column="10" lean-forward="true" selection-start-line="4" selection-start-column="10" selection-end-line="4" selection-end-column="10" />
           <folding>
             <element signature="n#style#0;n#image#0;n#navigator#0;n#swiper-item#0;n#block#0;n#repeat#0;n#swiper#0;n#template#0;n#!!top" expanded="true" />
           </folding>

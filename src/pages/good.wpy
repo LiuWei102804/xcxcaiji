@@ -4,7 +4,7 @@
 
     .page{
         width: 100%; padding: 0 0%; height: auto; overflow-x: hidden; background: #eee;
-        .title{ line-height: 20px; height: 20px; display: block; margin-top: 10px; }
+        .title{ line-height: 40rpx; height: 40rpx; display: block; margin-top: 10px; overflow: hidden; }
         .desc{ font-size: 12px; color: #666; }
         .good-name{ justify-content: space-between; -webkit-justify-content: space-between; background: #fff; padding: 0 2%; width: 96%; padding-bottom: 10px;
             label{ flex: 5; -webkit-flex: 5; }
@@ -49,7 +49,7 @@
     <view class="page">
         <label class="flex flex_align good-name">
             <label>
-                <h3 class="title">Apple iPhone XS Max (A2104) 256GB 深空灰色 移动联通电信4G手机 双卡双待</h3>
+                <text class="title">Apple iPhone XS Max (A2104) 256GB 深空灰色 移动联通电信4G手机 双卡双待</text>
                 <p class="desc">这是描述描述</p>
             </label>
             <p class="price">￥<text>11.38</text></p>
@@ -83,7 +83,7 @@
         // }
         data = {
             imgUrls : [
-                { link : "" , url : "../images/yu1.jpg"} ,
+                { link : "" , url : "../images/yu.jpg"} ,
                 { link : "" , url : "../images/yu2.jpg"} ,
                 { link : "" , url : "../images/yu3.jpg"}
             ] ,
