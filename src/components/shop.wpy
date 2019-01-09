@@ -9,7 +9,7 @@
             width: 100%;
             height: 60px;
             .checkbox{ font-size: 20px; flex: 1; -webkit-flex: 1; color: #478c1e; }
-            image{ width: 50px; height:50px;}
+            image{ width: 140rpx; height:140rpx;}
             .fa-check-circle{ color: #478c1e; }
             .shop-info{
                 flex: 7; -webkit-flex: 7; font-size: 12px; flex-direction: column; -webkit-flex-direction: column; height: 100%; padding: 0 10px; position: relative;
@@ -62,7 +62,7 @@
                     <i class="checkbox fa {{ item.checked ? 'fa-check-circle' : 'fa-circle-thin' }}" @tap="checkItem({{ index }})"></i>
                     <image src="{{ item.goodUrl }}"></image>
                     <view class="shop-info flex">
-                        <p>{{ item.title }}</p>
+                        <p>{{ item.name }}</p>
                         <text class="price">￥<text>{{ item.price }}</text></text>
                     </view>
                 </label>
@@ -93,54 +93,7 @@
             scrollHeight : 0 ,
             checkNum : 0 ,
             shopItems : [
-                {
-                    goodUrl : "../images/yu.jpg" ,
-                    title : "新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜" ,
-                    price : 12.8 ,
-                    checked : false
-                } ,
-                {
-                    goodUrl : "../images/yu.jpg" ,
-                    title : "layui 内置了七种背景色，以便你用于各种元素中，如：徽章、分割线、导航等等" ,
-                    price : 9.87 ,
-                    checked : false
-                } ,
-                {
-                    goodUrl : "../images/yu.jpg" ,
-                    title : "layui 内置了七种背景色，以便你用于各种元素中，如：徽章、分割线、导航等等" ,
-                    price : 9.87 ,
-                    checked : false
-                } ,
-                {
-                    goodUrl : "../images/yu.jpg" ,
-                    title : "layui 内置了七种背景色，以便你用于各种元素中，如：徽章、分割线、导航等等" ,
-                    price : 9.87 ,
-                    checked : false
-                } ,
-                {
-                    goodUrl : "../images/yu.jpg" ,
-                    title : "layui 内置了七种背景色，以便你用于各种元素中，如：徽章、分割线、导航等等" ,
-                    price : 9.87 ,
-                    checked : false
-                } ,
-                {
-                    goodUrl : "../images/yu.jpg" ,
-                    title : "layui 内置了七种背景色，以便你用于各种元素中，如：徽章、分割线、导航等等" ,
-                    price : 9.87 ,
-                    checked : false
-                } ,
-                {
-                    goodUrl : "../images/yu.jpg" ,
-                    title : "layui 内置了七种背景色，以便你用于各种元素中，如：徽章、分割线、导航等等" ,
-                    price : 9.87 ,
-                    checked : false
-                } ,
-                {
-                    goodUrl : "../images/yu.jpg" ,
-                    title : "layui 内置了七种背景色，以便你用于各种元素中，如：徽章、分割线、导航等等" ,
-                    price : 9.87 ,
-                    checked : false
-                }
+                { price : 2199.00 , long : "300m" , author : "黄贱贱" , name : "荣耀10 GT游戏加速 AIS手持夜景 6GB+64GB 幻夜黑 全网通 移动联通电信4G 双卡双待 游戏手机" , goodUrl : "../images/yu3.jpg" }
             ]
         }
         methods = {

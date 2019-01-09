@@ -25,13 +25,16 @@ setStore(store)
 export default class extends wepy.app {
   config = {
       pages: [
+
           "pages/index2" ,
-          "pages/good"
+          "pages/good" ,
+          "pages/list"
+
       ],
       window: {
           backgroundTextStyle: 'light',
           navigationBarBackgroundColor: '#fff',
-          navigationBarTitleText: '菜鸡',
+          navigationBarTitleText: '小商品市场',
           navigationBarTextStyle: 'black'
       }
   }

@@ -29,34 +29,50 @@
         width: 96%;
         margin: 0 auto;
         background: #fff;
-        padding: 8px 2%;
+        padding: 30rpx 2%;
         height: 60px;
-        image{ width: 18%; height: 50px; margin-right: 2%; }
+        image{ width: 140rpx; height: 140rpx; margin-right: 2%; }
         label{
             width:80%;
-            font-size: 12px; float: left; color: #666; display: block; -webkit-flex-direction: column; flex-direction: column; position: relative; height: 100%;
+            font-size: 12px; color: #666; display: block; -webkit-flex-direction: column; flex-direction: column; position: relative;
             .text{ display: block; }
             .text:nth-of-type(1){
                 overflow: hidden;
                 max-width:100%;
+                height: 100rpx;
                 text-overflow: ellipsis;
                 display: -webkit-box;
                 -webkit-line-clamp: 2;
                 line-clamp: 2;
                 -webkit-box-orient: vertical;
+                line-height: 50rpx;
             }
-            .price{ position: absolute; bottom: 0; color: red;
-                text{ font-size: 14px; }
-            }
-            .user{
-                position: absolute;
-                bottom: 0;
-                right: 0;
-                i{
-                    margin-right: 5px;
+            .other{
+                justify-content: space-between;
+                -webkit-justify-content: space-between;
+                .price{ color: red;
+                    text{ font-size: 14px; }
+                }
+                .user{
+                    i{
+                        margin-right: 5px;
+                    }
                 }
             }
+
         }
+    }
+    .more{ text-align: center; display: block; height: 80rpx; line-height: 80rpx; color: #999; font-size: 12px; }
+    .search{ width: 96%; padding: 5px 2%;  background: #fff; margin: 20rpx 0; font-size: 13px; position: relative;
+        input{ width: 72%; display: block; height: 30px; border-radius: 15px; border: 1px solid #ccc; margin: 0 auto; padding: 0 10% 0 8%; font-size: 13px; }
+        input::placeholder{ font-size: 12px;}
+        i{ position: absolute; font-size: 17px; right:10%; top:27%; color: #999; }
+    }
+    .publish{
+        width: 96%; height:auto; padding: 10rpx 2%; background: #fff; margin: 20rpx 0; font-size: 13px; justify-content: space-between;;
+        view{ flex-direction: column; -webkit-flex-direction: column; }
+        small{ color: #999; font-size: x-small; }
+        i{ float: right; font-size:38rpx; color: #999; }
     }
 </style>
 <template>
@@ -64,28 +80,50 @@
         <view class="header">
             <image src="../images/banner.jpg"></image>
         </view>
+        <view class="search">
+            <input type="text" placeholder="输入需要的商品" />
+            <i class="fa fa-search"></i>
+        </view>
         <view class="flex dir">
-            <a class="flex flex_align flex_just icon-shopcar" href="javascript:void(0)">
-                <i class="fa fa-shopping-cart"></i>
-                去买菜
+            <a class="flex flex_align flex_just" @tap="toList(1)" href="javascript:void(0)" style="color:#5FB878;">
+                <i class="fa fa-shopping-bag"></i>
+                2元店
             </a>
-            <a class="flex flex_align flex_just" href="javascript:void(0)">
-                <i class="fa fa-truck"></i>
-                去卖菜
+            <a class="flex flex_align flex_just" @tap="toList(2)" href="javascript:void(0)" style="color: #009688;">
+                <i class="fa fa-shopping-basket"></i>
+                3元店
+            </a>
+            <a class="flex flex_align flex_just" @tap="toList(3)" href="javascript:void(0)" style="color: #1E9FFF;">
+                <i class="fa fa-shopping-cart"></i>
+                5元店
+            </a>
+            <a class="flex flex_align flex_just" @tap="toList(4)" href="javascript:void(0)" style="color: #01AAED;">
+                <i class="fa fa-gift"></i>
+                10元店
             </a>
         </view>
-        <panel title="新鲜上架"></panel>
-
+        <view class="publish flex flex_align">
+            <view class="flex">
+                <text>我要发布</text>
+                <small>极速发布,轻松赚钱</small>
+            </view>
+            <i class="fa fa-location-arrow"></i>
+        </view>
+        <panel title="最新上架"></panel>
         <repeat for="{{hots}}" item="item">
             <view class="hot flex flex_align">
                 <image src="{{item.goodUrl}}"></image>
                 <label class="flex">
-                    <text class="text" @tap="toGood({{ item.id }})">{{ item.title }}</text>
-                    <text class="text price">￥<text>{{ item.price }}</text></text>
-                    <a class="user"><i class="fa fa-user-circle"></i>{{ item.author }}</a>
+                    <text class="text" @tap="toGood({{ item.id }})">{{ item.name }}</text>
+                    <view class="other flex flex_align">
+                        <text class="price">￥<text>{{ item.price }}</text></text>
+                        <a class="user"><i class="fa fa-user-circle"></i>{{ item.author }}</a>
+                        <a class="long">{{ item.long }}</a>
+                    </view>
                 </label>
             </view>
         </repeat>
+        <text class="more" @tap="toList(1)">查看更多</text>
 
     </view>
     <foot></foot>
@@ -106,40 +144,20 @@
         }
         data = {
             hots : [
-                {
-                    goodUrl : "../images/yu.jpg" ,
-                    title : "新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜" ,
-                    price : "13.8" ,
-                    author : "huangjiji" ,
-                    id : 1
-                } ,
-                {
-                    goodUrl : "../images/yu.jpg" ,
-                    title : "新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜" ,
-                    price : "16.4" ,
-                    author : "zaochuan" ,
-                    id : 2
-                } ,
-                {
-                    goodUrl : "../images/yu.jpg" ,
-                    title : "新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜" ,
-                    price : "13.1" ,
-                    author : "zaochuan" ,
-                    id : 3
-                } ,
-                {
-                    goodUrl : "../images/yu.jpg" ,
-                    title : "新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜上架湖州鲤鱼新鲜" ,
-                    price : "15.5" ,
-                    author : "zaochuan" ,
-                    id : 4
-                }
+                { price : 10999 , long : "100m" , author : "黄贱贱" , name : "Apple iPhone XS Max (A2104) 256GB 深空灰色 移动联通电信4G手机 双卡双待" , goodUrl : "../images/yu.jpg" } ,
+                { price : 2798 , long : "100m" , author : "黄贱贱" , name : "vivo X23全息幻彩版 6GB+128GB 北极晨曦 水滴屏全面屏 游戏手机 移动联通电信全网通4G手机" , goodUrl : "../images/yu2.jpg" } ,
+                { price : 2199.00 , long : "300m" , author : "黄贱贱" , name : "荣耀10 GT游戏加速 AIS手持夜景 6GB+64GB 幻夜黑 全网通 移动联通电信4G 双卡双待 游戏手机" , goodUrl : "../images/yu3.jpg" }
             ]
         }
         methods = {
             toGood( id ){
                 wx.navigateTo({
                     url : "/pages/good?id=" + id
+                });
+            } ,
+            toList( id ) {
+                wx.navigateTo({
+                    url : "/pages/list?shopId=" + id
                 });
             }
         }
