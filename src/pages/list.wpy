@@ -101,7 +101,6 @@
                             <a class="user"><i class="fa fa-user-circle"></i>{{ item.author }}</a>
                             <a class="long">{{ item.long }}</a>
                         </view>
-
                     </label>
                 </view>
             </repeat>

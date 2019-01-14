@@ -1,0 +1,41 @@
+<style lang="less">
+    @import "../static/flex";
+
+    .location{
+        width: 96%; height: 100rpx; padding: 10rpx 2%; font-size: 12px; background: #fff; border-bottom: 1px solid #ccc;
+        label{
+            flex: 7; -webkit-flex: 7; font-weight: bold; font-size: 14px;
+            a:first-child{ width: 30%; display: block; float: left; }
+            text{ font-weight: normal; font-size: 12px; color: #666; }
+        }
+        i{ flex: 1; -webkit-flex: 1; font-size: 50rpx; text-align: center; color: #478c1e; line-height: 100rpx;}
+    }
+
+</style>
+<template>
+    <repeat for="{{ locationList }}" item="item">
+        <view class="flex location flex_just">
+            <label class="location-data">
+                <view>
+                    <a>{{ item.name }}</a>
+                    <a>{{ item.phone }}</a>
+                </view>
+                <text>{{ item.loca }}</text>
+            </label>
+            <i class="fa fa-circle-thin"></i>
+        </view>
+    </repeat>
+</template>
+<script>
+    import wepy from "wepy";
+
+    export default class Local extends wepy.component{
+        data = {
+            locationList : [
+                { name : "黄贱贱" , phone : "188****8888" , loca : "上海市杨浦区政立路415号" } ,
+                { name : "黄贱贱" , phone : "188****8888" , loca : "上海市杨浦区政立路415号" }
+            ]
+        };
+
+    }
+</script>

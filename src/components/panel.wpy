@@ -6,6 +6,7 @@
         font-size: 14px;
         padding-top: 20rpx;
         padding-left: 2%;
+        padding-right: 2%;
         padding-bottom: 20rpx;
         border-bottom: 1px solid #ddd;
         font-weight: bold;

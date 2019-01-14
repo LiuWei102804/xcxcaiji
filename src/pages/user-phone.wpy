@@ -1,0 +1,23 @@
+<style lang="less">
+    @import "../static/flex";
+
+    label{ width: 100%; height: auto; background: #fff; border-bottom: 1px solid #999; line-height: 90rpx;
+        input{ width: 76%; height: 90rpx; line-height: 90rpx; padding: 0 2%;  }
+        text{ text-align: center; display: block; width: 20%; font-size: 30rpx; color: #999;}
+    }
+    .btn{ display: block; width: 96%; height: 100rpx; line-height: 100rpx; border-radius: 10rpx; text-align: center; color: #fff; margin: 30rpx auto; background: #478c1e; }
+</style>
+<template>
+    <label class="flex  ">
+        <input type="text" value="15888888888" placeholder="请输入手机号" maxlength="11" />
+        <text>验证码</text>
+    </label>
+    <text class="btn">提交</text>
+</template>
+<script>
+    import wepy from "wepy";
+
+    export default class UserPhone extends wepy.page{
+        data = {}
+    }
+</script>

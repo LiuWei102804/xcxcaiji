@@ -69,7 +69,7 @@
         i{ position: absolute; font-size: 17px; right:10%; top:27%; color: #999; }
     }
     .publish{
-        width: 96%; height:auto; padding: 10rpx 2%; background: #fff; margin: 20rpx 0; font-size: 13px; justify-content: space-between;;
+        width: 96%; height:auto; padding: 10rpx 2%; background: #fff; margin: 20rpx 0; font-size: 13px; justify-content: space-between;
         view{ flex-direction: column; -webkit-flex-direction: column; }
         small{ color: #999; font-size: x-small; }
         i{ float: right; font-size:38rpx; color: #999; }
@@ -102,7 +102,7 @@
                 10元店
             </a>
         </view>
-        <view class="publish flex flex_align">
+        <view class="publish flex flex_align" @tap="toPublish()">
             <view class="flex">
                 <text>我要发布</text>
                 <small>极速发布,轻松赚钱</small>
@@ -158,6 +158,11 @@
             toList( id ) {
                 wx.navigateTo({
                     url : "/pages/list?shopId=" + id
+                });
+            } ,
+            toPublish() {
+                wx.navigateTo({
+                    url : "/pages/publish"
                 });
             }
         }

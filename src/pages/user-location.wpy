@@ -1,0 +1,42 @@
+<style lang="less">
+    @import "../static/flex";
+    @import "../static/font-awesome";
+
+    .location{
+        width: 96%; height: 100rpx; padding: 10rpx 2%; font-size: 12px; background: #fff; border-bottom: 1px solid #ccc;
+        label{
+            flex: 7; -webkit-flex: 7; font-weight: bold; font-size: 14px;
+            a:first-child{ width: 30%; display: block; float: left; }
+            text{ font-weight: normal; font-size: 12px; color: #666; }
+        }
+        i{ flex: 1; -webkit-flex: 1; font-size: 16px; text-align: center; line-height: 100rpx; }
+    }
+    .add-btn{ position: fixed; display: block; bottom: 10rpx; width: 60%; height: 90rpx; line-height: 90rpx; background: #478c1e; color: #fff; padding: 0; left: 20%; border-radius: 10rpx; text-align: center; } 
+</style>
+<template>
+    <repeat for="{{ locationList }}" item="item">
+        <view class="flex location flex_just">
+            <label class="location-data">
+                <view>
+                    <a>{{ item.name }}</a>
+                    <a>{{ item.phone }}</a>
+                </view>
+                <text>{{ item.loca }}</text>
+            </label>
+            <i class="edit fa fa-edit"></i>
+        </view>
+    </repeat>
+    <a class="add-btn">新增地址</a>
+</template>
+<script>
+    import wepy from "wepy";
+
+    export default class UserLocation extends wepy.page{
+        data = {
+            locationList : [
+                { name : "黄贱贱" , phone : "188****8888" , loca : "上海市杨浦区政立路415号" } ,
+                { name : "郭造船" , phone : "176****2981" , loca : "上海市杨浦区政立路415号" }
+            ]
+        }
+    }
+</script>

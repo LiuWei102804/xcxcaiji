@@ -39,11 +39,11 @@
 
         </view>
         <view class="data">
-            <label>
+            <label @tap="goTo('../pages/user-phone')">
                 <text>手机号</text>
                 <i class="fa fa-angle-right"></i>
             </label>
-            <label>
+            <label @tap="goTo('../pages/user-location')">
                 <text>地址管理</text>
                 <i class="fa fa-angle-right"></i>
             </label>
@@ -81,6 +81,11 @@
                         })
                     }
                 })
+            } ,
+            goTo( url ) {
+                wx.navigateTo({
+                    url : url
+                });
             }
         }
         onLoad(){
