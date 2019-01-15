@@ -30,8 +30,8 @@ export default class extends wepy.app {
           "pages/list" ,
           "pages/publish" ,
           "pages/user-phone" ,
-          "pages/user-location"
-
+          "pages/user-location" ,
+          "pages/add-location"
       ],
       window: {
           backgroundTextStyle: 'light',

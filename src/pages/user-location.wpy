@@ -11,7 +11,7 @@
         }
         i{ flex: 1; -webkit-flex: 1; font-size: 16px; text-align: center; line-height: 100rpx; }
     }
-    .add-btn{ position: fixed; display: block; bottom: 10rpx; width: 60%; height: 90rpx; line-height: 90rpx; background: #478c1e; color: #fff; padding: 0; left: 20%; border-radius: 10rpx; text-align: center; } 
+    .add-btn{ position: fixed; display: block; bottom: 10rpx; width: 96%; height: 90rpx; line-height: 90rpx; background: #478c1e; color: #fff; padding: 0; left: 2%; border-radius: 10rpx; text-align: center; }
 </style>
 <template>
     <repeat for="{{ locationList }}" item="item">
@@ -23,13 +23,15 @@
                 </view>
                 <text>{{ item.loca }}</text>
             </label>
-            <i class="edit fa fa-edit"></i>
+            <i class="edit fa fa-edit" @tap="toAddLocation"></i>
         </view>
     </repeat>
-    <a class="add-btn">新增地址</a>
+    <a class="add-btn" @tap="toAddLocation()">新增地址</a>
+
 </template>
 <script>
     import wepy from "wepy";
+
 
     export default class UserLocation extends wepy.page{
         data = {
@@ -37,6 +39,16 @@
                 { name : "黄贱贱" , phone : "188****8888" , loca : "上海市杨浦区政立路415号" } ,
                 { name : "郭造船" , phone : "176****2981" , loca : "上海市杨浦区政立路415号" }
             ]
+        }
+        components = {
+
+        }
+        methods = {
+            toAddLocation : () => {
+                wx.navigateTo({
+                    url : "/pages/add-location"
+                });
+            }
         }
     }
 </script>

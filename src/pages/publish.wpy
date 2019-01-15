@@ -2,13 +2,14 @@
     @import "../static/flex";
     @import "../static/font-awesome";
 
+
     .publish_item{ width: 96%; height: 80rpx; padding: 0 2%; border-bottom: 1px solid #ccc; display: block; line-height: 80rpx; background: #fff;
         input{ font-size: 30rpx; height: 99%; width: 100%; }
         .fa-angle-right{ float: right; font-size:20px; line-height: 80rpx; color: #ccc; }
     }
     .publish_item_image{
         width: 96%; height: auto; padding: 20rpx 2%; background: #fff;
-        .image_connaction{ width: 18%; height: 140rpx; border: 1px dashed #ccc; text-align: center; line-height: 140rpx; margin-right: 2%; position: relative;
+        .image_connaction{ width: 18%; height: 140rpx; border: 1px solid #ccc; text-align: center; line-height: 140rpx; margin-right: 2%; position: relative;
             image{ width: 100%; height: 100%; }
             .fa-minus-circle{ position: absolute; right: -14rpx; top: -14rpx; color: red;  }
             .fa-image{ color: #ccc; font-size: 100rpx; line-height: 140rpx; }
@@ -20,24 +21,24 @@
     .publish_btn{
         display: block; width: 96%; height: 100rpx; line-height: 100rpx; color: #fff; background: #478c1e; text-align: center; border-radius: 5rpx; margin: 100rpx auto 0;
     }
-    .local{ position: absolute; top:0; bottom: 0; background: #fff; width: 90%; z-index: 99; right: 0; box-shadow: 0rpx 10rpx 40rpx 0 #478c1e; -webkit-box-shadow: 0rpx 10rpx 40rpx 0 #478c1e; }
+    .local{ position: fixed; top:0; width:100%; height: 100%; z-index: 99; left: 0%; transform: translate(100%,0); -webkit-transform: translate(100%,0); }
 </style>
 <template>
     <label class="publish_item">
         <input type="text" placeholder="请输入商品名称" />
     </label>
     <label class="publish_item">
-        <input type="text" placeholder="请输入商品价格" />
+        <input type="number" placeholder="请输入商品价格" />
     </label>
     <label class="publish_item">
-        <input type="text" placeholder="请输入商品库存" />
+        <input type="number" placeholder="请输入商品库存" />
     </label>
     <label class="publish_item">
         <input type="text" placeholder="请输入商品描述" />
     </label>
-    <label class="publish_item" style="border-bottom: none;">发布地址</label>
+    <label class="publish_item" style="border-bottom: none;">发货地址</label>
     <label class="publish_item" @tap="useLocal()">
-        <input type="text" placeholder="请选择发布地址" disabled="true" style="width: 90%; float: left;" />
+        <input type="text" value="{{ useLocal }}" placeholder="请选择发布地址" disabled="true" style="width: 90%; float: left;" />
         <i class="fa fa-angle-right"></i>
     </label>
     <label class="publish_item" style="border-bottom: none;">选择图片</label>
@@ -52,7 +53,7 @@
             <i class="fa fa-image"></i>
         </view>
     </label>
-    <view class="local" wx:if="{{ localStatu }}">
+    <view class="local" animation="{{animationData}}" @tap="localHide({{ event }})" id="local">
         <local></local>
     </view>
 
@@ -60,6 +61,7 @@
 </template>
 <script>
     import wepy from "wepy";
+    import animate from "../util/animate";
     import Local from "../components/location";
 
 
@@ -67,11 +69,27 @@
         data = {
             goodPics : [] ,
             count : 5 ,
-            localStatu : false
+            animationData : {} ,
+            useLocal : ""
         }
         components = {
             local : Local
         };
+        events = {
+            "customHide" : id => {
+                this.animationData = animate().translate("100%","0").step();
+            } ,
+            "customChecked" : item => {
+                if( Boolean( item ) ) {
+                    this.useLocal = item.loca + " " + item.name;
+                } else {
+                    this.useLocal = "";
+                }
+
+                this.animationData = animate().translate("100%","0").step();
+                //console.log( item )
+            }
+        }
         methods = {
             //选择图片
             chooseImg(){
@@ -100,11 +118,20 @@
             *   选择地址
             * */
             useLocal(){
-                this.localStatu = true;
+                this.animationData = animate().translate("0%","0").step();
+            } ,
+            /*
+            *   隐藏地址栏
+            * */
+            localHide( evt ){
+                let id = evt.target.id;
+                if( id == "local" ) {
+                    this.animationData = animate().translate("100%","0").step();
+                }
             }
         }
         onLoad(){
-            //wx.createAnimation()
+
         }
     }
 </script>

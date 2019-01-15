@@ -1,0 +1,142 @@
+<style lang="less">
+    @import "../static/flex";
+    @import "../static/font-awesome";
+
+
+    .location-add-item{
+        display: block; width: 96%; height: 100rpx; padding: 0 2%; line-height: 100rpx; background: #fff; border-bottom: 1px solid #ccc; position: relative;
+        text{ width: 20%; float: left; }
+        input,.location-view{ width: 66%; float: left; height: 100%; line-height: 100rpx; padding: 0 2%; }
+        .fa-angle-down{ font-size: 60rpx; color: #ccc; }
+    }
+    .select-component{
+        width: 100%; height: auto; position: absolute; left: 0%; bottom: 0rpx; z-index: 10; background: #fff;
+        picker-view{ width: 100%; height: 400rpx; }
+        .ok-btn{ padding: 10rpx 20rpx; position: absolute; right: 2%; top: 10rpx; color: #000; border: 1px solid #ccc; border-radius: 5rpx; z-index: 9; }
+        .cancel-btn{ padding: 10rpx 20rpx; position: absolute; right: 19%; top: 10rpx; color: #000; border: 1px solid #ccc; border-radius: 5rpx; z-index: 9;  }
+    }
+    .add-btn{ display: block; bottom: 10rpx; width: 96%; height: 90rpx; line-height: 90rpx; background: #478c1e; color: #fff; padding: 0; border-radius: 10rpx; text-align: center; margin: 50rpx auto 0; }
+
+</style>
+<template>
+    <label class="location-add-item">
+        <text>姓名：</text>
+        <input type="text" placeholder="请输入姓名" />
+    </label>
+    <label class="location-add-item">
+        <text>电话：</text>
+        <input type="tel" placeholder="请输入电话" />
+    </label>
+    <view class="location-add-item">
+        <text>省：</text>
+        <input type="tel" value="{{provinceStr}}" placeholder="请选择省" disabled="true" @tap="selectItem({{'province'}})" />
+        <i class="fa fa-angle-down"></i>
+    </view>
+    <label class="location-add-item">
+        <text>市：</text>
+        <input type="tel" value="{{cityStr}}" placeholder="请选择市" disabled="true" @tap="selectItem({{'city'}})" />
+        <i class="fa fa-angle-down"></i>
+    </label>
+    <label class="location-add-item">
+        <text>区/县：</text>
+        <input type="tel" value="{{areaStr}}" placeholder="请选择区/县" disabled="true" @tap="selectItem({{'area'}})" />
+        <i class="fa fa-angle-down"></i>
+    </label>
+    <label class="location-add-item">
+        <text>街道：</text>
+        <input type="text" placeholder="请输入街道" />
+    </label>
+    <a class="add-btn" @tap="addLocation">保存</a>
+    <view class="select-component" wx:if="{{selectStatu}}">
+        <a class="ok-btn" @tap="selectSuccess">确认</a>
+        <a class="cancel-btn" @tap="selectCancel">取消</a>
+        <picker-view indicator-style="font-weight: bold;" bindchange="bindChange">
+            <picker-view-column>
+                <repeat for="{{ currLocal }}" item="item" index="index">
+                    <view style="padding: 0 2%; ">{{ item.name }}</view>
+                </repeat>
+            </picker-view-column>
+        </picker-view>
+    </view>
+</template>
+<script>
+    import wepy from "wepy";
+
+    export default class AddLocation extends wepy.page{
+        data = {
+            province :[
+                { name : "上海市" } ,
+                { name : "北京市" } ,
+                { name : "深圳市" } ,
+            ] ,
+            city : [
+                { name : "上海市" } ,
+                { name : "北京市" } ,
+                { name : "深圳市" } ,
+            ] ,
+            area : [
+                { name : "杨浦区" } ,
+                { name : "黄浦区" } ,
+                { name : "闵行区" } ,
+            ] ,
+            currLocal : [
+                { name : "上海市" } ,
+                { name : "北京市" } ,
+                { name : "深圳市" }
+            ] ,
+            provinceStr : "" ,
+            cityStr : "" ,
+            areaStr : "" ,
+            currIndex : 0 ,
+            selectStatu : false ,
+            selectType : "province"
+        }
+        methods = {
+            /*
+            *   选择省市区
+            * */
+            selectItem : type => {
+                this.selectStatu = true;
+                this.selectType = type;
+                this.currLocal = this[this.selectType];
+            } ,
+            /*
+            *   确认选择
+            * */
+            selectSuccess : () => {
+                if( this.currIndex < 0 ) {
+                    return;
+                }
+                switch( this.selectType ) {
+                    case "province" :
+                        this.provinceStr = this["province"][this.currIndex].name;
+                        break;
+                    case "city" :
+                        this.cityStr = this["city"][this.currIndex].name;
+                        break;
+                    case "area" :
+                        this.areaStr = this["area"][this.currIndex].name;
+                        break;
+                }
+                this.selectStatu = false;
+            } ,
+            /*
+            *   取消选择
+            * */
+            selectCancel : () => {
+                this.selectStatu = false;
+            } ,
+            /*
+            *   保存地址
+            * */
+            addLocation : () => {
+
+            }
+        }
+        bindChange( e ){
+            const val = e.detail.value[0];
+            this.currIndex = val;
+        }
+
+    }
+</script>

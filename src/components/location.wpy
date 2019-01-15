@@ -1,41 +1,105 @@
 <style lang="less">
-    @import "../static/flex";
-
-    .location{
-        width: 96%; height: 100rpx; padding: 10rpx 2%; font-size: 12px; background: #fff; border-bottom: 1px solid #ccc;
-        label{
-            flex: 7; -webkit-flex: 7; font-weight: bold; font-size: 14px;
-            a:first-child{ width: 30%; display: block; float: left; }
-            text{ font-weight: normal; font-size: 12px; color: #666; }
+    .localtion-box{ width: 90%; height:100% ; background: #fff; margin-left: 10%;  box-shadow: 0rpx 10rpx 40rpx 0 #478c1e; -webkit-box-shadow: 0rpx 10rpx 40rpx 0 #478c1e; overflow-y: auto; overflow-x: hidden; position: relative;
+        .btns{ justify-content: space-between; -webkit-justify-content: space-between; margin-bottom: 30rpx;  width: 96%; padding: 0 2%; height: 68rpx;
+            a{ padding: 10rpx 20rpx; border-radius: 10rpx;  color: #fff;  }
+            a:first-child{ background: #478c1e;}
+            a:last-child{ background: #FF5722; }
         }
-        i{ flex: 1; -webkit-flex: 1; font-size: 50rpx; text-align: center; color: #478c1e; line-height: 100rpx;}
+
+        .location{
+            width: 96%; height: 100rpx; padding: 10rpx 2%; font-size: 12px; background: #fff; border-bottom: 1px solid #ccc;
+            label{
+                flex: 7; -webkit-flex: 7; font-weight: bold; font-size: 14px;
+                a:first-child{ width: 30%; display: block; float: left; }
+                text{ font-weight: normal; font-size: 12px; color: #666; }
+            }
+            i{ flex: 1; -webkit-flex: 1; font-size: 50rpx; text-align: center; color: #478c1e; line-height: 100rpx;}
+        }
     }
+
 
 </style>
 <template>
-    <repeat for="{{ locationList }}" item="item">
-        <view class="flex location flex_just">
-            <label class="location-data">
-                <view>
-                    <a>{{ item.name }}</a>
-                    <a>{{ item.phone }}</a>
-                </view>
-                <text>{{ item.loca }}</text>
-            </label>
-            <i class="fa fa-circle-thin"></i>
+    <view class="localtion-box">
+        <view class="btns flex">
+            <a @tap="checkOk()">确定</a>
+            <a @tap="localHide()">取消</a>
         </view>
-    </repeat>
+
+        <scroll-view scroll-y style="height: {{ maxHeight }}px;">
+            <repeat for="{{ locationList }}" item="item" index="index">
+                <view class="flex location flex_just">
+                    <label class="location-data">
+                        <view>
+                            <a>{{ item.name }}</a>
+                            <a>{{ item.phone }}</a>
+                        </view>
+                        <text>{{ item.loca }}</text>
+                    </label>
+                    <i class="fa {{ item.checked ? 'fa-check-circle' : 'fa-circle-thin' }}" @tap="checkLocalItem({{ index }},{{ item }})"></i>
+                </view>
+            </repeat>
+        </scroll-view>
+
+    </view>
 </template>
 <script>
     import wepy from "wepy";
+    import { RPX } from "../util/info";
 
     export default class Local extends wepy.component{
         data = {
             locationList : [
                 { name : "黄贱贱" , phone : "188****8888" , loca : "上海市杨浦区政立路415号" } ,
-                { name : "黄贱贱" , phone : "188****8888" , loca : "上海市杨浦区政立路415号" }
-            ]
+                { name : "郭海宇" , phone : "173****1278" , loca : "上海市杨浦区政立路415号" }
+
+            ] ,
+            maxHeight : 0 ,
+            checked : -1
         };
+        methods = {
+            /*
+            *   选中单项
+            * */
+            checkLocalItem( index , item ) {
+                this.locationList.forEach((item,index) => {
+                    item.checked = false;
+                })
+                item.checked = !item.checked;
+                if( item.checked ) {
+                    this.checked = index;
+                } else {
+                    this.checked = -1;
+                }
+
+                this.locationList[index] = item;
+            } ,
+            /*
+            *   取消按钮
+            * */
+            localHide(){
+                this.$emit("customHide");
+            } ,
+            /*
+            *   确定选中
+            * */
+            checkOk(){
+                if( this.checked > -1 ) {
+                    this.$emit("customChecked" , this.locationList[this.checked] );
+                } else {
+                    this.$emit("customChecked" , "" );
+                }
+            }
+        }
+        onLoad(){
+            const query = wx.createSelectorQuery();
+            const _this = this;
+            query.select(".localtion-box").boundingClientRect();
+            query.exec(function (res) {
+                _this.maxHeight = res[0].height - ( 98 * RPX );
+                _this.$apply();
+            });
+        }
 
     }
 </script>
