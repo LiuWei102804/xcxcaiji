@@ -11,7 +11,9 @@
   box-sizing: border-box;
 }
 </style>
+<template>
 
+</template>
 <script>
 import wepy from 'wepy'
 import 'wepy-async-function'
@@ -51,7 +53,28 @@ export default class extends wepy.app {
   }
 
   onLaunch() {
-      this.testAsync()
+      this.testAsync();
+      wx.login({
+          success : res => {
+              console.log( res )
+              wepy.request({
+                  url : "http://localhost:8999/api/login.json" ,
+                  method : "POST" ,
+                  data : { code : res.code } ,
+                  success : result => {
+                      console.log( result )
+                  }
+              })
+          }
+      })
+      // wx.getUserInfo({
+      //     success : function( res ) {
+      //         console.log( res )
+      //     }
+      // })
+  }
+  onLoad(){
+
   }
 
   sleep (s) {
@@ -67,18 +90,19 @@ export default class extends wepy.app {
       console.log(data)
   }
 
-  getUserInfo( cb ) {
-      const that = this;
-      if ( this.globalData.userInfo ) {
-          return this.globalData.userInfo
-      }
-
-      wepy.getUserInfo({
-          success (res) {
-              that.globalData.userInfo = res.userInfo;
-              cb && cb(res.userInfo)
-          }
-      })
+  getUserInfo(res) {
+      // const that = this;
+      // if ( this.globalData.userInfo ) {
+      //     return this.globalData.userInfo
+      // }
+      //
+      // wepy.getUserInfo({
+      //     success (res) {
+      //         console.log( res )
+      //         that.globalData.userInfo = res.userInfo;
+      //         cb && cb(res.userInfo)
+      //     }
+      // })
   }
 
 }

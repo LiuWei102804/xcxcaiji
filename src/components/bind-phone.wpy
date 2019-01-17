@@ -1,0 +1,26 @@
+<style lang="less">
+    .full-mark{ width: 100%; height: 100%; position: fixed; top: 0; left: 0; z-index: 1000; background: rgba(0,0,0,0.7);
+        .set-phone{ width: 70%; height: 300rpx; padding: 40rpx 5%; background: #fff; text-align: center; position: absolute; left: 10%; top: 50%; margin-top: -190rpx;
+            input{ width: 92%; height: 80rpx; line-height: 80rpx; border: 1px solid #ccc; text-align: left; padding: 0 4%; margin-bottom: 30rpx; border-radius: 5rpx; }
+            a{ display: block; height: 80rpx; line-height: 80rpx; text-align: center; color: #fff; margin: 0 auto; background: #478c1e; border-radius: 5rpx; }
+        }
+    }
+</style>
+<template>
+    <view class="full-mark">
+        <view class="set-phone">
+            <input type="tel" maxlength="11" placeholder="请绑定手机号" />
+            <input type="number" maxlength="11" placeholder="请输入验证码" />
+            <a>提交</a>
+        </view>
+    </view>
+</template>
+<script>
+    import wepy from "wepy";
+
+    export default class BindPhone extends wepy.component{
+        data = {
+
+        };
+    }
+</script>

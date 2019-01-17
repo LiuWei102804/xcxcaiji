@@ -21,30 +21,30 @@
 <template>
     <label class="location-add-item">
         <text>姓名：</text>
-        <input type="text" placeholder="请输入姓名" />
+        <input type="text" data-name="realName" @input="setInput" placeholder="请输入姓名" />
     </label>
     <label class="location-add-item">
         <text>电话：</text>
-        <input type="tel" placeholder="请输入电话" />
+        <input type="tel" data-name="phone" @input="setInput" placeholder="请输入电话" maxlength="11" />
     </label>
     <view class="location-add-item">
         <text>省：</text>
-        <input type="tel" value="{{provinceStr}}" placeholder="请选择省" disabled="true" @tap="selectItem({{'province'}})" />
+        <input type="tel" value="{{locationData.province}}" placeholder="请选择省" disabled="true" @tap="selectItem({{'province'}})" />
         <i class="fa fa-angle-down"></i>
     </view>
     <label class="location-add-item">
         <text>市：</text>
-        <input type="tel" value="{{cityStr}}" placeholder="请选择市" disabled="true" @tap="selectItem({{'city'}})" />
+        <input type="tel" value="{{locationData.city}}" placeholder="请选择市" disabled="true" @tap="selectItem({{'city'}})" />
         <i class="fa fa-angle-down"></i>
     </label>
     <label class="location-add-item">
         <text>区/县：</text>
-        <input type="tel" value="{{areaStr}}" placeholder="请选择区/县" disabled="true" @tap="selectItem({{'area'}})" />
+        <input type="tel" value="{{locationData.area}}" placeholder="请选择区/县" disabled="true" @tap="selectItem({{'area'}})" />
         <i class="fa fa-angle-down"></i>
     </label>
     <label class="location-add-item">
         <text>街道：</text>
-        <input type="text" placeholder="请输入街道" />
+        <input type="text" data-name="street" @input="setInput" placeholder="请输入街道" />
     </label>
     <a class="add-btn" @tap="addLocation">保存</a>
     <view class="select-component" wx:if="{{selectStatu}}">
@@ -53,7 +53,7 @@
         <picker-view indicator-style="font-weight: bold;" bindchange="bindChange">
             <picker-view-column>
                 <repeat for="{{ currLocal }}" item="item" index="index">
-                    <view style="padding: 0 2%; ">{{ item.name }}</view>
+                    <view style="padding: 0 2%; ">{{ item.areaName }}</view>
                 </repeat>
             </picker-view-column>
         </picker-view>
@@ -64,32 +64,25 @@
 
     export default class AddLocation extends wepy.page{
         data = {
-            province :[
-                { name : "上海市" } ,
-                { name : "北京市" } ,
-                { name : "深圳市" } ,
-            ] ,
-            city : [
-                { name : "上海市" } ,
-                { name : "北京市" } ,
-                { name : "深圳市" } ,
-            ] ,
-            area : [
-                { name : "杨浦区" } ,
-                { name : "黄浦区" } ,
-                { name : "闵行区" } ,
-            ] ,
-            currLocal : [
-                { name : "上海市" } ,
-                { name : "北京市" } ,
-                { name : "深圳市" }
-            ] ,
-            provinceStr : "" ,
-            cityStr : "" ,
-            areaStr : "" ,
+            province :[] ,
+            city : [] ,
+            area : [] ,
+            currLocal : [] ,
             currIndex : 0 ,
             selectStatu : false ,
-            selectType : "province"
+            selectType : "province" ,
+            locationData : {
+                realName : "" ,
+                phone : "" ,
+                province : "" ,
+                city : "" ,
+                area : "" ,
+                street : ""
+            } ,
+            queryLocaData : {
+                level : "1" ,
+                parentId : "1"
+            }
         }
         methods = {
             /*
@@ -109,16 +102,29 @@
                 }
                 switch( this.selectType ) {
                     case "province" :
-                        this.provinceStr = this["province"][this.currIndex].name;
+                        this.locationData.province = this["province"][this.currIndex].areaName;
+                        this.queryLocaData.parentId = this["province"][this.currIndex].areaId;
+                        this.locationData.city = "";
+                        this.locationData.area = "";
+                        this.city = [];
+                        this.area = [];
+                        this.queryLocaData.level = 2;
+                        this.queryLocationData();
                         break;
                     case "city" :
-                        this.cityStr = this["city"][this.currIndex].name;
+                        this.locationData.city = this["city"][this.currIndex].areaName;
+                        this.queryLocaData.parentId = this["city"][this.currIndex].areaId;
+                        this.locationData.area = "";
+                        this.area = [];
+                        this.queryLocaData.level = 3;
+                        this.queryLocationData();
                         break;
                     case "area" :
-                        this.areaStr = this["area"][this.currIndex].name;
+                        this.locationData.area = this["area"][this.currIndex].areaName;
                         break;
                 }
                 this.selectStatu = false;
+                this.currIndex = 0;
             } ,
             /*
             *   取消选择
@@ -130,12 +136,97 @@
             *   保存地址
             * */
             addLocation : () => {
+                let _this = this;
+                if( this.locationData.realName == "" ) {
+                    wx.showToast({ title : "请填写姓名" , icon : "none" });
+                    return;
+                }
+                if( this.locationData.phone == "" ) {
+                    wx.showToast({ title : "请填写电话" , icon : "none" });
+                    return;
+                }
+                if( this.locationData.province == "" ) {
+                    wx.showToast({ title : "请选择省" , icon : "none" });
+                    return;
+                }
+                if( this.locationData.province == "" ) {
+                    wx.showToast({ title : "请选择市" , icon : "none" });
+                    return;
+                }
+                if( this.locationData.area == "" ) {
+                    wx.showToast({ title : "请选择区/县" , icon : "none" });
+                    return;
+                }
+                wx.showLoading("加载中...");
+                wepy.request({
+                    url: "http://localhost:8999/api/addUserLocation.json",
+                    method : "POST" ,
+                    data : _this.locationData ,
+                    success : function ( d ) {
+                        let data = d.data;
+                        switch( data.code ) {
+                            case 200 :
+                                wx.showToast({ title : "添加成功" , icon : "none" });
+                                break;
+                            default :
+                                wx.showToast({ title :data.msg , icon : "none"  } );
+                        }
+                    } ,
+                    complete : function () {
+                        wx.hideLoading();
+                    }
+                })
+            } ,
+            /*
+            *   输入框变化
+            * */
+            setInput( e ){
+                let dataset = e.currentTarget.dataset;
+                this.locationData[dataset.name] = e.detail.value;
+            } ,
 
-            }
         }
         bindChange( e ){
             const val = e.detail.value[0];
             this.currIndex = val;
+        }
+        /*
+        *   查询地址
+        * */
+        queryLocationData(){
+            let _this = this;
+            wx.showLoading("加载中...");
+            wepy.request({
+                url: "http://localhost:8999/api/getLocation.json",
+                method : "GET" ,
+                data : _this.queryLocaData ,
+                success : function ( d ) {
+                    let data = d.data;
+                    switch( data.code ) {
+                        case 200 :
+                            console.log( _this )
+                            if( _this.queryLocaData.level == 1 ) {
+                                _this.province = _this.province.concat( data.result );
+                            }
+                            if( _this.queryLocaData.level == 2 ) {
+                                _this.city = _this.city.concat( data.result );
+                            }
+                            if( _this.queryLocaData.level == 3 ) {
+                                _this.area = _this.area.concat( data.result );
+                            }
+                            break;
+                        default :
+                        //wx.showToast({ title :data.msg , icon : "none"  } );
+                    }
+                } ,
+                complete : function () {
+                    wx.hideLoading();
+                }
+            })
+        }
+        onLoad(){
+            console.log( this )
+            this.queryLocationData();
         }
 
     }

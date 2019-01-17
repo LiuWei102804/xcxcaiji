@@ -6,6 +6,7 @@
     .tab{ height: calc(100% - 46px); overflow: auto; overflow-x: hidden; background: #eee; position: relative; }
 </style>
 <template>
+    <bindphone></bindphone>
     <view class="tab">
         <home wx:if="{{ tabActive == 0 }}"></home>
         <shop wx:if="{{ tabActive == 1 }}"></shop>
@@ -19,6 +20,7 @@
     import User from "../components/user";
     import Shop from "../components/shop";
     import Foot from "../components/foot";
+    import BindPhone from "../components/bind-phone";
     import { WINHEIGHT , RPX } from "../util/info";
 
     export default class Index2 extends wepy.page {
@@ -29,7 +31,8 @@
             home : Home ,
             shop : Shop ,
             user : User ,
-            foot : Foot
+            foot : Foot ,
+            bindphone : BindPhone
         }
         data = {
             tabActive : 0 ,
@@ -44,11 +47,16 @@
             }
         }
         onLoad(params, data) {
+
             //this.scrollHeight = WINHEIGHT;
             // let self = this;
             // this.$parent.getUserInfo(function ( userInfo ) {
             //     console.log( 1111, userInfo )
             // })
         }
+        getPhoneNumber( e ){
+
+        }
+
     }
 </script>

@@ -25,16 +25,16 @@
 </style>
 <template>
     <label class="publish_item">
-        <input type="text" placeholder="请输入商品名称" />
+        <input type="text" data-name="name" placeholder="请输入商品名称" @input="setInput" />
     </label>
     <label class="publish_item">
-        <input type="number" placeholder="请输入商品价格" />
+        <input type="number" data-name="price" placeholder="请输入商品价格" @input="setInput" />
     </label>
     <label class="publish_item">
-        <input type="number" placeholder="请输入商品库存" />
+        <input type="number" data-name="stock" placeholder="请输入商品库存" @input="setInput" />
     </label>
     <label class="publish_item">
-        <input type="text" placeholder="请输入商品描述" />
+        <input type="text" data-name="desc" placeholder="请输入商品描述" @input="setInput" />
     </label>
     <label class="publish_item" style="border-bottom: none;">发货地址</label>
     <label class="publish_item" @tap="useLocal()">
@@ -43,13 +43,13 @@
     </label>
     <label class="publish_item" style="border-bottom: none;">选择图片</label>
     <label class="publish_item_image flex">
-        <repeat for="{{ goodPics }}" item="item" index="index">
+        <repeat for="{{ goodData.pics }}" item="item" index="index">
             <view class="image_connaction">
                 <image src="{{ item.path }}"></image>
                 <i class="fa fa-minus-circle" @tap="removeImgae({{ index }})"></i>
             </view>
         </repeat>
-        <view class="image_connaction" @tap="chooseImg()" wx:if="{{ goodPics.length < 5 }}">
+        <view class="image_connaction" @tap="chooseImg()" wx:if="{{ goodData.pics.length < 5 }}">
             <i class="fa fa-image"></i>
         </view>
     </label>
@@ -57,7 +57,7 @@
         <local></local>
     </view>
 
-    <a class="publish_btn">发布</a>
+    <a class="publish_btn" @tap="publish()">发布</a>
 </template>
 <script>
     import wepy from "wepy";
@@ -67,10 +67,17 @@
 
     export default class Publish extends wepy.page {
         data = {
-            goodPics : [] ,
             count : 5 ,
             animationData : {} ,
-            useLocal : ""
+            useLocal : "" ,
+            goodData : {
+                name : "" ,                         //商品名称
+                price : "" ,                        //商品价格
+                stock : "" ,                        //商品库存
+                desc : "" ,                         //描述
+                locaId : "" ,                       //地址ID
+                pics : []                           //图片集合
+            }
         }
         components = {
             local : Local
@@ -98,9 +105,9 @@
                     count : _this.count ,
                     sizeType : ["compressed"] ,
                     success : res => {
-                        _this.goodPics = _this.goodPics.concat( res.tempFiles );
+                        _this.goodData.pics = _this.goodData.pics.concat( res.tempFiles );
                         _this.$apply();
-                        _this.count = Math.max( 0 , 5 - _this.goodPics.length );
+                        _this.count = Math.max( 0 , 5 - _this.goodData.pics.length );
                     } ,
                     complete : () => {
 
@@ -111,7 +118,7 @@
             *   删除图片
             * */
             removeImgae( index ){
-                this.goodPics.splice( index , 1 );
+                this.goodData.pics.splice( index , 1 );
                 this.count += 1;
             } ,
             /*
@@ -128,6 +135,38 @@
                 if( id == "local" ) {
                     this.animationData = animate().translate("100%","0").step();
                 }
+            } ,
+            /*
+            *   发布商品
+            * */
+            publish(){
+                const _this = this;
+                wx.showLoading("加载中...");
+                wepy.request({
+                    url: "http://localhost:8999/api/publish.json",
+                    method : "POST" ,
+                    data : _this.goodData ,
+                    success: function ( d ) {
+                        let data = d.data;
+                        switch( data.code ) {
+                            case 200 :
+                                wx.showToast({ title : "发布成功" , icon : "none" });
+                                break;
+                            default :
+                                wx.showToast({ title :data.msg , icon : "none"  } );
+                        }
+                    } ,
+                    complete : function () {
+                        wx.hideLoading();
+                    }
+                })
+            } ,
+            /*
+            *   输入框变化
+            * */
+            setInput( e ){
+                let dataset = e.currentTarget.dataset;
+                this.goodData[dataset.name] = e.detail.value;
             }
         }
         onLoad(){
