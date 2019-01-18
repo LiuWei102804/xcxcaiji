@@ -49,22 +49,36 @@ export default class extends wepy.app {
 
   constructor () {
       super()
-      this.use('requestfix')
+      this.use('requestfix');
+
+      this.intercept("request",{
+          config( p ){
+              let token = wx.getStorageSync("token");
+              if( token ) {
+                  p.header = {
+                      cookie : `token=${token}`
+                  }
+              }
+
+              return p;
+          }
+      })
   }
+
 
   onLaunch() {
       this.testAsync();
       wx.login({
           success : res => {
               console.log( res )
-              wepy.request({
-                  url : "http://localhost:8999/api/login.json" ,
-                  method : "POST" ,
-                  data : { code : res.code } ,
-                  success : result => {
-                      console.log( result )
-                  }
-              })
+              // wepy.request({
+              //     url : "http://localhost:8999/api/login.json" ,
+              //     method : "POST" ,
+              //     data : { code : res.code } ,
+              //     success : result => {
+              //         console.log( result )
+              //     }
+              // })
           }
       })
       // wx.getUserInfo({

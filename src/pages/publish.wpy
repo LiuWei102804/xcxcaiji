@@ -94,7 +94,6 @@
                 }
 
                 this.animationData = animate().translate("100%","0").step();
-                //console.log( item )
             }
         }
         methods = {

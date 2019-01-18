@@ -1,26 +1,117 @@
 <style lang="less">
-    .full-mark{ width: 100%; height: 100%; position: fixed; top: 0; left: 0; z-index: 1000; background: rgba(0,0,0,0.7);
-        .set-phone{ width: 70%; height: 300rpx; padding: 40rpx 5%; background: #fff; text-align: center; position: absolute; left: 10%; top: 50%; margin-top: -190rpx;
-            input{ width: 92%; height: 80rpx; line-height: 80rpx; border: 1px solid #ccc; text-align: left; padding: 0 4%; margin-bottom: 30rpx; border-radius: 5rpx; }
-            a{ display: block; height: 80rpx; line-height: 80rpx; text-align: center; color: #fff; margin: 0 auto; background: #478c1e; border-radius: 5rpx; }
+    .full-mark{ width: 100%; height: 100%; position: fixed; top: 0; left: 0; z-index: 1000; background: rgba(0,0,0,0.8);
+        .set-phone{ width: 70%; height: 380rpx; padding: 0rpx 5%; background: #fff; position: absolute; left: 10%; top: 50%; margin-top: -190rpx; transform: scale(0); opacity: 0; -webkit-transform:scale(0);
+            .code{ position: absolute; right: 50rpx; height: 70rpx; line-height: 70rpx; text-align: center; font-size: 24rpx; width: 100rpx; background: #478c1e; color: #fff; top: 50rpx; z-index: 10;}
+            input{ width: 92%; height: 80rpx; border: 1px solid #ccc; text-align: left; padding: 0 4%; margin-bottom: 30rpx; border-radius: 5rpx; }
+            .submit{ display: block; height: 80rpx; line-height: 80rpx; text-align: center; color: #fff; margin: 0 auto; background: #478c1e; border-radius: 5rpx; }
         }
     }
 </style>
 <template>
     <view class="full-mark">
-        <view class="set-phone">
-            <input type="tel" maxlength="11" placeholder="请绑定手机号" />
-            <input type="number" maxlength="11" placeholder="请输入验证码" />
-            <a>提交</a>
+        <view class="set-phone" animation="{{animationData}}">
+            <input type="tel" data-name="account" value="{{sendCodeData.account}}" @input="setInput" maxlength="11" placeholder="请绑定手机号" style="width: 70%; padding: 0 26% 0 4%;  margin-top: 40rpx; " />
+            <a class="code" @tap="sendCode">验证码</a>
+            <input type="number" data-name="code" value="{{sendCodeData.code}}" @input="setInput" maxlength="6" placeholder="请输入验证码" />
+            <a class="submit" @tap="login">提交</a>
         </view>
     </view>
 </template>
 <script>
     import wepy from "wepy";
+    import Pattern from "../util/pattern";
+    import animate from "../util/animate";
+
+    const pattern = new Pattern();
 
     export default class BindPhone extends wepy.component{
         data = {
+            sendCodeData : {
+                code : "" ,
+                account : ""
+            } ,
+            animationData : {}
 
         };
+        methods = {
+            /*
+            *   发送验证码
+            * */
+            sendCode(){
+                const _this = this;
+                if( !pattern.isPhone( this.sendCodeData.account ) ) {
+                    wx.showToast({ title :"手机号不能为空" , icon : "none"  } );
+                    return;
+                }
+                wx.showLoading("加载中...");
+                wepy.request({
+                    url : "http://localhost:8999/api/sendCode.json" ,
+                    method : "POST" ,
+                    data : {
+                        account : _this.sendCodeData.account
+                    } ,
+                    success : function ( d ) {
+                        let data = d.data;
+                        switch( data.code ) {
+                            case 200 :
+                                _this.sendCodeData["code"] = data.result;
+                                _this.$apply();
+                                break;
+                            default :
+                                wx.showToast({ title : data.msg  , icon : "none"  } );
+                        }
+                    } ,
+                    complete : function () {
+                        wx.hideLoading();
+                    }
+                })
+            } ,
+            /*
+            *   登录
+            * */
+            login(){
+                const _this = this;
+                if( !pattern.isPhone( this.sendCodeData.account ) ) {
+                    wx.showToast({ title :"手机号不能为空" , icon : "none"  } );
+                    return;
+                }
+                if( !Boolean( this.sendCodeData.code ) ) {
+                    wx.showToast({ title :"验证码不能为空" , icon : "none"  } );
+                    return;
+                }
+                wx.showLoading("加载中...");
+                wepy.request({
+                    url : "http://localhost:8999/api/login.json" ,
+                    method : "POST" ,
+                    data : _this.sendCodeData ,
+                    success : function ( d ) {
+                        let data = d.data;
+                        switch( data.code ) {
+                            case 200 :
+                                _this.$emit("customHide" );
+                                wx.setStorageSync( "token" ,  data.result );
+                                wx.setStorageSync( "account" ,  _this.sendCodeData.account );
+                                break;
+                            default :
+                                wx.showToast({ title : data.msg  , icon : "none"  } );
+                        }
+                    } ,
+                    complete : function () {
+                        wx.hideLoading();
+                    }
+                })
+            } ,
+            /*
+            *   输入框变化
+            * */
+            setInput( e ){
+                let dataset = e.currentTarget.dataset;
+                this.sendCodeData[dataset.name] = e.detail.value;
+            } ,
+        }
+        onLoad(){
+            this.animationData = animate().scale(1).opacity(1).step();
+            this.$apply();
+        }
     }
 </script>

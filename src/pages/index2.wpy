@@ -6,7 +6,7 @@
     .tab{ height: calc(100% - 46px); overflow: auto; overflow-x: hidden; background: #eee; position: relative; }
 </style>
 <template>
-    <bindphone></bindphone>
+    <bindphone wx:if="{{!isLogin}}"></bindphone>
     <view class="tab">
         <home wx:if="{{ tabActive == 0 }}"></home>
         <shop wx:if="{{ tabActive == 1 }}"></shop>
@@ -36,7 +36,8 @@
         }
         data = {
             tabActive : 0 ,
-            scrollHeight : 0
+            scrollHeight : 0 ,
+            isLogin : false
         }
         methods = {
 
@@ -44,6 +45,9 @@
         events = {
             "tab" : ( index ) => {
                 this.tabActive = index;
+            } ,
+            "customHide" : ( data ) => {
+                this.isLogin = true;
             }
         }
         onLoad(params, data) {

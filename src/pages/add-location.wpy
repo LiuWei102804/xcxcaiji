@@ -159,7 +159,7 @@
                 }
                 wx.showLoading("加载中...");
                 wepy.request({
-                    url: "http://localhost:8999/api/addUserLocation.json",
+                    url: "http://localhost:8999/loca/addUserLocation.json",
                     method : "POST" ,
                     data : _this.locationData ,
                     success : function ( d ) {
@@ -197,7 +197,7 @@
             let _this = this;
             wx.showLoading("加载中...");
             wepy.request({
-                url: "http://localhost:8999/api/getLocation.json",
+                url: "http://localhost:8999/loca/getLocation.json",
                 method : "GET" ,
                 data : _this.queryLocaData ,
                 success : function ( d ) {
