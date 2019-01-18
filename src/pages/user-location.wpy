@@ -48,7 +48,35 @@
                 wx.navigateTo({
                     url : "/pages/add-location"
                 });
-            }
+            } ,
+
+        }
+        /*
+        *   查询用户地址
+        * */
+        queryUserLocations(){
+            let _this = this;
+            wx.showLoading("加载中...");
+            wepy.request({
+                url: "http://localhost:8999/loca/userLocations.json",
+                method : "GET" ,
+                success : function ( d ) {
+                    let data = d.data;
+                    switch( data.code ) {
+                        case 200 :
+                            console.log( data )
+                            break;
+                        default :
+                        //wx.showToast({ title :data.msg , icon : "none"  } );
+                    }
+                } ,
+                complete : function () {
+                    wx.hideLoading();
+                }
+            })
+        }
+        onLoad(){
+            this.queryUserLocations();
         }
     }
 </script>
