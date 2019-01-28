@@ -204,7 +204,6 @@
                     let data = d.data;
                     switch( data.code ) {
                         case 200 :
-                            console.log( _this )
                             if( _this.queryLocaData.level == 1 ) {
                                 _this.province = _this.province.concat( data.result );
                             }
@@ -225,7 +224,6 @@
             })
         }
         onLoad(){
-            console.log( this )
             this.queryLocationData();
         }
 

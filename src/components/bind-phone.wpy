@@ -10,7 +10,7 @@
 <template>
     <view class="full-mark">
         <view class="set-phone" animation="{{animationData}}">
-            <input type="tel" data-name="account" value="{{sendCodeData.account}}" @input="setInput" maxlength="11" placeholder="请绑定手机号" style="width: 70%; padding: 0 26% 0 4%;  margin-top: 40rpx; " />
+            <input type="tel" data-name="account" value="{{sendCodeData.account}}" @input="setInput" maxlength="11" placeholder="请输入手机号" style="width: 70%; padding: 0 26% 0 4%;  margin-top: 40rpx; " />
             <a class="code" @tap="sendCode">验证码</a>
             <input type="number" data-name="code" value="{{sendCodeData.code}}" @input="setInput" maxlength="6" placeholder="请输入验证码" />
             <a class="submit" @tap="login">提交</a>

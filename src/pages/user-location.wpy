@@ -14,31 +14,34 @@
     .add-btn{ position: fixed; display: block; bottom: 10rpx; width: 96%; height: 90rpx; line-height: 90rpx; background: #478c1e; color: #fff; padding: 0; left: 2%; border-radius: 10rpx; text-align: center; }
 </style>
 <template>
-    <repeat for="{{ locationList }}" item="item">
-        <view class="flex location flex_just">
-            <label class="location-data">
-                <view>
-                    <a>{{ item.name }}</a>
-                    <a>{{ item.phone }}</a>
-                </view>
-                <text>{{ item.loca }}</text>
-            </label>
-            <i class="edit fa fa-edit" @tap="toAddLocation"></i>
-        </view>
-    </repeat>
+    <scroll-view scroll-y style="height:{{ scrollHeight }}px">
+        <repeat for="{{ locationList }}" item="item">
+            <view class="flex location flex_just">
+                <label class="location-data">
+                    <view>
+                        <a>{{ item.realName }}</a>
+                        <a>{{ item.phone }}</a>
+                    </view>
+                    <text>{{ item.loca }}</text>
+                </label>
+                <i class="edit fa fa-edit" @tap="toAddLocation"></i>
+            </view>
+        </repeat>
+    </scroll-view>
+
     <a class="add-btn" @tap="toAddLocation()">新增地址</a>
 
 </template>
 <script>
     import wepy from "wepy";
+    import { WINHEIGHT , RPX } from "../util/info";
+
 
 
     export default class UserLocation extends wepy.page{
         data = {
-            locationList : [
-                { name : "黄贱贱" , phone : "188****8888" , loca : "上海市杨浦区政立路415号" } ,
-                { name : "郭造船" , phone : "176****2981" , loca : "上海市杨浦区政立路415号" }
-            ]
+            locationList : [] ,
+            scrollHeight : 0
         }
         components = {
 
@@ -50,6 +53,12 @@
                 });
             } ,
 
+        }
+        events = {
+            "addlocation" : () => {
+                console.log("addlocation")
+                this.queryUserLocations();
+            }
         }
         /*
         *   查询用户地址
@@ -64,10 +73,11 @@
                     let data = d.data;
                     switch( data.code ) {
                         case 200 :
-                            console.log( data )
+                            _this.locationList = _this.locationList.concat( data.result );
+                            _this.$apply();
                             break;
                         default :
-                        //wx.showToast({ title :data.msg , icon : "none"  } );
+                            wx.showToast({ title :data.msg , icon : "none"  } );
                     }
                 } ,
                 complete : function () {
@@ -76,6 +86,7 @@
             })
         }
         onLoad(){
+            this.scrollHeight = WINHEIGHT - ( 90 * RPX );
             this.queryUserLocations();
         }
     }
