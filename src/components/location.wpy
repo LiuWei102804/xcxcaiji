@@ -20,27 +20,32 @@
 
 </style>
 <template>
-    <view class="localtion-box">
-        <view class="btns flex">
-            <a @tap="checkOk()">确定</a>
-            <a @tap="localHide()">取消</a>
-        </view>
+    <view class="localtion-box" wx:if="{{locationList.length > 0}}">
 
-        <scroll-view scroll-y style="height: {{ maxHeight }}px;">
-            <repeat for="{{ locationList }}" item="item" index="index">
-                <view class="flex location flex_just">
-                    <label class="location-data">
-                        <view>
-                            <a>{{ item.name }}</a>
-                            <a>{{ item.phone }}</a>
-                        </view>
-                        <text>{{ item.loca }}</text>
-                    </label>
-                    <i class="fa {{ item.checked ? 'fa-check-circle' : 'fa-circle-thin' }}" @tap="checkLocalItem({{ index }},{{ item }})"></i>
-                </view>
-            </repeat>
-        </scroll-view>
+            <view class="btns flex">
+                <a @tap="checkOk()">确定</a>
+                <a @tap="localHide()">取消</a>
+            </view>
 
+            <scroll-view scroll-y style="height: {{ maxHeight }}px;">
+                <repeat for="{{ locationList }}" item="item" index="index">
+                    <view class="flex location flex_just">
+                        <label class="location-data">
+                            <view>
+                                <a>{{ item.user_real_name }}</a>
+                                <a>{{ item.phone }}</a>
+                            </view>
+                            <text>{{ item.street }}</text>
+                        </label>
+                        <i class="fa {{ item.checked ? 'fa-check-circle' : 'fa-circle-thin' }}" @tap="checkLocalItem({{ index }},{{ item }})"></i>
+                    </view>
+                </repeat>
+            </scroll-view>
+
+
+    </view>
+    <view class="localtion-box" wx:else="{{locationList.length == 0}}" style="text-align: center">
+        <button size="mini" type="default" style="margin-top: 100rpx;" @tap="addLocation()">添加地址</button>
     </view>
 </template>
 <script>
@@ -49,14 +54,17 @@
 
     export default class Local extends wepy.component{
         data = {
-            locationList : [
-                { name : "黄贱贱" , phone : "188****8888" , loca : "上海市杨浦区政立路415号" } ,
-                { name : "郭海宇" , phone : "173****1278" , loca : "上海市杨浦区政立路415号" }
-
-            ] ,
+            locationList : [] ,
             maxHeight : 0 ,
-            checked : -1
+            checked : -1 ,
+            params : {
+                offset : 0 ,
+                limit : 10
+            }
         };
+        events = {
+
+        }
         methods = {
             /*
             *   选中单项
@@ -89,7 +97,51 @@
                 } else {
                     this.$emit("customChecked" , "" );
                 }
+            } ,
+            /*
+            *   添加地址
+            * */
+            addLocation(){
+                this.$emit("customHide");
+                wx.navigateTo({
+                    url : "/pages/add-location"
+                });
             }
+
+        }
+        /*
+        *   手机号加密
+        * */
+        transformPhone( phone ){
+            let start = phone.substring(0,3);
+            let end = phone.substring( 7 );
+            return start + "****" + end;
+        }
+        /*
+        *   获取用户绑定的地址
+        * */
+        userLocation( params ){
+            const _this = this;
+            let { offset = 0 , limit = 10 } = params;
+            wepy.request({
+                url: "http://localhost:8999/location/query.json",
+                method : "GET" ,
+                data : _this.goodData ,
+                success : ( d ) => {
+                    let data = d.data;
+                    switch( data.code ) {
+                        case 200 :
+                            data.result.forEach( item => {
+                                item.phone = this.transformPhone( item.phone );
+                            })
+                            _this.locationList = _this.locationList.concat( data.result );
+                            _this.$apply();
+                            break;
+                        default :
+
+                    }
+                }
+            })
         }
         onLoad(){
             const query = wx.createSelectorQuery();
@@ -99,6 +151,7 @@
                 _this.maxHeight = res[0].height - ( 98 * RPX );
                 _this.$apply();
             });
+            this.userLocation({ offset : 0 , limit : 10 });
         }
 
     }

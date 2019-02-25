@@ -2,17 +2,27 @@
     @import "../static/flex";
     @import "../static/font-awesome";
 
+    swiper{
+        height: 180px;
+    }
     .page{
         width: 100%; padding: 0 0%; height: auto; overflow-x: hidden; background: #eee;
         .title{ line-height: 40rpx; height: auto; display: block; margin-top: 10px; overflow: hidden; }
-        .desc{ font-size: 12px; color: #666; }
-        .good-name{ justify-content: space-between; -webkit-justify-content: space-between; background: #fff; padding: 0 2%; width: 96%; padding-bottom: 10px;
-            label{ flex: 5; -webkit-flex: 5; }
-            .price{ color: red; font-size: 12px; flex: 1; -webkit-flex: 1;
+        .desc{ font-size: 12px; color: #666; display: block; }
+        .good-name{  background: #fff; padding: 5px 2% 0; width: 96%; padding-bottom: 10px; height: auto; display: block;}
+        .shop{
+            justify-content: space-between;
+            -webkit-justify-content: space-between;
+            width: 96%;
+            padding: 5px 2%;
+            background: #fff;
+            margin-bottom: 10px;
+            .price{ color: red; font-size: 12px;
                 text{ font-size: 14px; }
             }
-            .add{ font-size: 24px; color: #666; flex: 1; -webkit-flex: 1; text-align: right; }
+            .add{ font-size: 24px; color: #666; text-align: right; }
         }
+
         .user{ font-size: 12px; color: #666; background: #fff; display: block; width: 96%; padding: 10px 2%;
             i{ margin-right: 5px; }
         }
@@ -36,33 +46,34 @@
 </style>
 <template>
     <swiper indicator-dots="true" autoplay="true" interval="3000" duration="600" circular="true">
-        <repeat for="{{ imgUrls }}" item="item" key="index">
+        <repeat for="{{ good.pics }}" item="item" key="index">
             <block>
                 <swiper-item style="width: 100%; height: 100%; overflow: hidden;">
-                    <navigator url="{{item.link}}" hover-class="navigator-hover">
-                        <image src="{{item.url}}" class="slide-image" style="width: 100%; height: 150px;" />
-                    </navigator>
+                    <!--<navigator url="{{item.link}}" hover-class="navigator-hover">-->
+                        <image src="{{item}}" class="slide-image" style="width: 100%; height: 180px;" />
+                    <!--</navigator>-->
                 </swiper-item>
             </block>
         </repeat>
     </swiper>
     <view class="page">
-        <label class="flex flex_align good-name">
-            <label>
-                <text class="title">Apple iPhone XS Max (A2104) 256GB 深空灰色 移动联通电信4G手机 双卡双待</text>
-                <p class="desc">这是描述描述</p>
-            </label>
-            <p class="price">￥<text>11.38</text></p>
+        <label class="good-name">
+            <text class="title">{{ good.name }}</text>
+            <p class="desc">{{ good.describe }}</p>
+        </label>
+        <label class="flex flex_align shop">
+            <p class="price">￥<text>{{ good.price }}</text></p>
             <a class="add"><i class="fa fa-cart-plus"></i></a>
         </label>
-        <a class="user"><i class="fa fa-user-circle"></i>huangjiji 发表于2小时前</a>
+
+        <a class="user"><i class="fa fa-user-circle"></i>{{ userInfo.nick_name }} 发表于{{ good.fmtCreatedAt }}小时前</a>
 
         <view class="more">
             <text class="has">该用户还有</text>
             <view class="other">
                 <repeat for="{{ otherData }}" item="item">
                     <label>
-                        <image src="{{ item.goodUrl }}"></image>
+                        <image src="{{ item.pics[0] }}"></image>
                         <text class="name">{{ item.name }}</text>
                         <p class="price flex flex_align">
                             <a>￥<text>{{ item.price }}</text></a>
@@ -82,19 +93,82 @@
         //     super();
         // }
         data = {
-            imgUrls : [
-                { link : "" , url : "../images/good/1.jpg"} ,
-                { link : "" , url : "../images/good/2.jpg"}
-            ] ,
-            otherData : [
-                { price : 10999.00 , long : "100m" , author : "黄贱贱2元店" , name : "Apple iPhone XS Max (A2104) 256GB 深空灰色 移动联通电信4G手机 双卡双待" , goodUrl : "../images/yu.jpg" } ,
-                { price : 2798.00 , long : "100m" , author : "黄贱贱2元店" , name : "vivo X23全息幻彩版 6GB+128GB 北极晨曦 水滴屏全面屏 游戏手机 移动联通电信全网通4G手机" , goodUrl : "../images/yu2.jpg" } ,
-                { price : 2199.00 , long : "300m" , author : "黄贱贱2元店" , name : "荣耀10 GT游戏加速 AIS手持夜景 6GB+64GB 幻夜黑 全网通 移动联通电信4G 双卡双待 游戏手机" , goodUrl : "../images/yu3.jpg" } ,
-                { price : 2949.00 , long : "800m" , author : "造船的小店" , name : "一加手机6 8GB+128GB 亮瓷黑 高通骁龙845 全面屏双摄游戏手机 全网通4G 双卡双待" , goodUrl : "../images/yu4.jpg" }
-            ]
+            good : {
+                pics : []
+            } ,
+            userInfo : {} ,
+            otherData : []
+        }
+        /*
+        *   计算时间
+        * */
+        calculationTime( time ){
+            let ms = new Date( time ).getTime();
+            let now = Date.now();
+            return Math.floor( ( ( now - ms ) / 1000 ) / 3600 );
+        }
+
+        /*
+        *   通过ID 查询商品
+        * */
+        getProductById( id ){
+            const _this = this;
+            wepy.request({
+                url : "http://localhost:8999/product/getProductById.json" ,
+                type : "GET" ,
+                data : {
+                    id : id
+                } ,
+                success : d => {
+                    let data = d.data;
+                    switch( data.code ) {
+                        case 200 :
+                            data.result.fmtCreatedAt = _this.calculationTime( data.result.createdAt );
+
+                            _this.good = data.result;
+                            console.log(_this.good  )
+                            _this.$apply();
+                            break;
+                        default :
+
+                    }
+                } ,
+                error : err => {
+
+                }
+            })
+        }
+        /*
+        *   通过用户查询商品
+        * */
+        getProductByUser( id ){
+            const _this = this;
+            wepy.request({
+                url : "http://localhost:8999/product/getProductByUser.json" ,
+                type : "GET" ,
+                data : {
+                    userId : id
+                } ,
+                success : d => {
+                    let data = d.data;
+                    switch( data.code ) {
+                        case 200 :
+                            _this.otherData = _this.otherData.concat( data.result );
+                            _this.$apply();
+                            break;
+                        default :
+
+                    }
+                } ,
+                error : err => {
+
+                }
+            })
         }
         onLoad( option ){
-            console.log( option.id )
+            this.userInfo = this.$parent.globalData.userInfo;
+            this.getProductById( option.id );
+            this.getProductByUser( option.userId );
         }
     }
 </script>

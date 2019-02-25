@@ -34,7 +34,7 @@
         <input type="number" data-name="stock" placeholder="请输入商品库存" @input="setInput" />
     </label>
     <label class="publish_item">
-        <input type="text" data-name="desc" placeholder="请输入商品描述" @input="setInput" />
+        <input type="text" data-name="describe" placeholder="请输入商品描述" @input="setInput" />
     </label>
     <label class="publish_item" style="border-bottom: none;">发货地址</label>
     <label class="publish_item" @tap="useLocal()">
@@ -43,13 +43,13 @@
     </label>
     <label class="publish_item" style="border-bottom: none;">选择图片</label>
     <label class="publish_item_image flex">
-        <repeat for="{{ goodData.pics }}" item="item" index="index">
+        <repeat for="{{ pics }}" item="item" index="index">
             <view class="image_connaction">
-                <image src="{{ item.path }}"></image>
+                <image src="{{ item }}"></image>
                 <i class="fa fa-minus-circle" @tap="removeImgae({{ index }})"></i>
             </view>
         </repeat>
-        <view class="image_connaction" @tap="chooseImg()" wx:if="{{ goodData.pics.length < 5 }}">
+        <view class="image_connaction" @tap="chooseImg()" wx:if="{{ pics.length < 5 }}">
             <i class="fa fa-image"></i>
         </view>
     </label>
@@ -70,12 +70,13 @@
             count : 5 ,
             animationData : {} ,
             useLocal : "" ,
+            pics : [] ,                              //图片集合
             goodData : {
                 name : "" ,                         //商品名称
                 price : "" ,                        //商品价格
                 stock : "" ,                        //商品库存
-                desc : "" ,                         //描述
-                locaId : "" ,                       //地址ID
+                describe : "" ,                         //描述
+                user_local_id : "" ,                       //地址ID
                 pics : []                           //图片集合
             }
         }
@@ -88,7 +89,8 @@
             } ,
             "customChecked" : item => {
                 if( Boolean( item ) ) {
-                    this.useLocal = item.loca + " " + item.name;
+                    this.goodData.user_local_id = item["_id"];
+                    this.useLocal = item.street + " " + item.user_real_name;
                 } else {
                     this.useLocal = "";
                 }
@@ -104,9 +106,9 @@
                     count : _this.count ,
                     sizeType : ["compressed"] ,
                     success : res => {
-                        _this.goodData.pics = _this.goodData.pics.concat( res.tempFiles );
+                        _this.pics = _this.pics.concat( res.tempFilePaths );
                         _this.$apply();
-                        _this.count = Math.max( 0 , 5 - _this.goodData.pics.length );
+                        _this.count = Math.max( 0 , 5 - _this.pics.length );
                     } ,
                     complete : () => {
 
@@ -138,35 +140,100 @@
             /*
             *   发布商品
             * */
-            publish(){
+            async publish(){
                 const _this = this;
+                let goodData = this.goodData;
+                if( !Boolean( goodData.name ) ) {
+                    wx.showToast({ title : "需要填写名称" , icon : "none" });
+                    return;
+                }
+                if( !Boolean( goodData.price ) ) {
+                    wx.showToast({ title : "需要填写价格" , icon : "none" });
+                    return;
+                }
+                if( !Boolean( goodData.stock ) ) {
+                    wx.showToast({ title : "需要填写库存" , icon : "none" });
+                    return;
+                }
+                if( !Boolean( goodData.user_local_id ) ) {
+                    wx.showToast({ title : "需要选择发货地址" , icon : "none" });
+                    return;
+                }
+                if( !_this.pics[0] ) {
+                    wx.showToast({ title : "至少选择一张图片" , icon : "none" });
+                    return;
+                }
                 wx.showLoading("加载中...");
-                wepy.request({
-                    url: "http://localhost:8999/api/publish.json",
-                    method : "POST" ,
-                    data : _this.goodData ,
-                    success: function ( d ) {
-                        let data = d.data;
-                        switch( data.code ) {
-                            case 200 :
-                                wx.showToast({ title : "发布成功" , icon : "none" });
-                                break;
-                            default :
-                                wx.showToast({ title :data.msg , icon : "none"  } );
-                        }
-                    } ,
-                    complete : function () {
-                        wx.hideLoading();
-                    }
-                })
+                let dt1 = await this.uploadPic();
+                let dt2 = await this.saveData();
+                switch( dt2.code ) {
+                    case 200 :
+                        wx.showToast({ title : "发布成功" , icon : "none" });
+                        break;
+                    default :
+                        wx.showToast({ title :data.msg , icon : "none"  } );
+                }
+                wx.hideLoading();
             } ,
+
             /*
             *   输入框变化
             * */
             setInput( e ){
                 let dataset = e.currentTarget.dataset;
                 this.goodData[dataset.name] = e.detail.value;
-            }
+            } ,
+
+        }
+        saveData(){
+            const _this = this;
+            return new Promise(( resolve , reject ) => {
+                wepy.request({
+                    url: "http://localhost:8999/product/save.json",
+                    method: "POST",
+                    data: _this.goodData,
+                    success : function ( res ) {
+                        resolve( res.data );
+                    } ,
+                    error : function ( err ) {
+                        reject( err );
+                    }
+                });
+            })
+            //let data = await
+            //console.log( data )
+        }
+        /*
+        *   上传图片
+        * */
+        uploadPic(){
+            const _this = this;
+            return new Promise(( resolve , reject ) => {
+                for( let i = 0; i < _this.pics.length; i ++ ) {
+                    wx.uploadFile({
+                        url : "http://localhost:8999/product/uploadPic.json" ,
+                        name : "avatar" ,
+                        header : {
+                            contentType :"multipart/form-data; charset=utf-8" ,
+                            cookie : `SID=${wx.getStorageSync("SID")}`
+                        } ,
+                        filePath : _this.pics[i] ,
+                        success : function ( res ) {
+                            _this.goodData.pics.push( JSON.parse( res.data ).result );
+                            _this.$apply();
+                            if( i == _this.pics.length - 1 ) {
+                                resolve("ok");
+                            }
+                        } ,
+                        error : function ( err ) {
+                            reject( err );
+                        } ,
+                        complete : function () {
+                            wx.hideLoading("加载中...");
+                        }
+                    })
+                }
+            })
         }
         onLoad(){
 

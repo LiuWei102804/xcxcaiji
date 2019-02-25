@@ -23,6 +23,7 @@
             i{ font-size:20px; float: right; margin-top: 7px; color: #666; }
         }
     }
+    .logout{ width: 90%; height: 80rpx; margin: 10px auto 0; border-radius: 10rpx; line-height: 80rpx; background: #FF5722; color: #fff; text-align: center; }
 </style>
 <template>
     <view class="content">
@@ -60,6 +61,7 @@
                 <i class="fa fa-angle-right"></i>
             </label>
         </view>
+        <view class="logout" @tap="logout()">退出</view>
     </view>
 
 </template>
@@ -86,6 +88,30 @@
                 wx.navigateTo({
                     url : url
                 });
+            } ,
+            async logout(){
+                let d = await new Promise(( resolve , reject) => {
+                    wepy.request({
+                        url : "http://localhost:8999/user/logout.json" ,
+                        success : res => {
+                            resolve("ok");
+                        }
+                    });
+                });
+
+                if( d == "ok" ) {
+                    wx.showModal({
+                        title: '提示',
+                        content: '这是一个模态弹窗',
+                        success(res) {
+                            if (res.confirm) {
+                                console.log('用户点击确定')
+                            } else if (res.cancel) {
+                                console.log('用户点击取消')
+                            }
+                        }
+                    })
+                }
             }
         }
         onLoad(){

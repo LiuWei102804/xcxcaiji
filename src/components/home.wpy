@@ -2,7 +2,7 @@
     .header{
         overflow: hidden;
         image{
-            height: 150px;
+            height: 180px;
             width: 100%;
         }
     }
@@ -109,16 +109,16 @@
             </view>
             <i class="fa fa-location-arrow"></i>
         </view>
-        <panel title="最新上架"></panel>
+        <panel title="热卖商品"></panel>
         <repeat for="{{hots}}" item="item">
             <view class="hot flex flex_align">
-                <image src="{{item.goodUrl}}"></image>
+                <image src="{{item.pics[0]}}"></image>
                 <label class="flex">
-                    <text class="text" @tap="toGood({{ item.id }})">{{ item.name }}</text>
+                    <text class="text" @tap="toGood({{ item._id }},{{ item.user_id }})">{{ item.name }}</text>
                     <view class="other flex flex_align">
                         <text class="price">￥<text>{{ item.price }}</text></text>
-                        <a class="user"><i class="fa fa-user-circle"></i>{{ item.author }}</a>
-                        <a class="long">{{ item.long }}</a>
+                        <a class="user"><i class="fa fa-user-circle"></i>{{ item.user_nick_name }}</a>
+                        <!--<a class="long">{{ item.long }}</a>-->
                     </view>
                 </label>
             </view>
@@ -143,16 +143,12 @@
             toast: Toast
         }
         data = {
-            hots : [
-                { price : 10999 , long : "100m" , author : "黄贱贱" , name : "Apple iPhone XS Max (A2104) 256GB 深空灰色 移动联通电信4G手机 双卡双待" , goodUrl : "../images/yu.jpg" } ,
-                { price : 2798 , long : "100m" , author : "黄贱贱" , name : "vivo X23全息幻彩版 6GB+128GB 北极晨曦 水滴屏全面屏 游戏手机 移动联通电信全网通4G手机" , goodUrl : "../images/yu2.jpg" } ,
-                { price : 2199.00 , long : "300m" , author : "黄贱贱" , name : "荣耀10 GT游戏加速 AIS手持夜景 6GB+64GB 幻夜黑 全网通 移动联通电信4G 双卡双待 游戏手机" , goodUrl : "../images/yu3.jpg" }
-            ]
+            hots : []
         }
         methods = {
-            toGood( id ){
+            toGood( id , userId ){
                 wx.navigateTo({
-                    url : "/pages/good?id=" + id
+                    url : "/pages/good?id=" + id + "&userId=" + userId
                 });
             } ,
             toList( id ) {
@@ -166,8 +162,33 @@
                 });
             }
         }
+        /*
+        *   热门商品
+        * */
+        hotProducts(){
+            const _this = this;
+            wepy.request({
+                url : "http://localhost:8999/product/hotProducts.json" ,
+                data : {
+                    offset : 0 ,
+                    limit : 3
+                } ,
+                method : "GET" ,
+                success : d => {
+                    let data = d.data;
+                    switch( data.code ) {
+                        case 200 :
+                            _this.hots = _this.hots.concat( data.result );
+                            _this.$apply();
+                            break;
+                        default :
+                            wx.showToast({ title : data.msg  , icon : "none"  } );
+                    }
+                }
+            });
+        };
         onLoad (){
-
+            this.hotProducts();
         }
     }
 </script>

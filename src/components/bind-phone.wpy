@@ -28,7 +28,7 @@
         data = {
             sendCodeData : {
                 code : "" ,
-                account : ""
+                account : "13857102804"
             } ,
             animationData : {}
 
@@ -45,7 +45,7 @@
                 }
                 wx.showLoading("加载中...");
                 wepy.request({
-                    url : "http://localhost:8999/api/sendCode.json" ,
+                    url : "http://localhost:8999/user/vcode.json" ,
                     method : "POST" ,
                     data : {
                         account : _this.sendCodeData.account
@@ -81,7 +81,7 @@
                 }
                 wx.showLoading("加载中...");
                 wepy.request({
-                    url : "http://localhost:8999/api/login.json" ,
+                    url : "http://localhost:8999/user/login.json" ,
                     method : "POST" ,
                     data : _this.sendCodeData ,
                     success : function ( d ) {
@@ -89,8 +89,10 @@
                         switch( data.code ) {
                             case 200 :
                                 _this.$emit("customHide" );
-                                wx.setStorageSync( "token" ,  data.result );
-                                wx.setStorageSync( "account" ,  _this.sendCodeData.account );
+                                _this.$root.$parent.globalData.userInfo = data.result;
+                                wx.setStorageSync( d.cookies[0].name , d.cookies[0].value )
+                                // wx.setStorageSync( "token" ,  data.result );
+                                // wx.setStorageSync( "account" ,  _this.sendCodeData.account );
                                 break;
                             default :
                                 wx.showToast({ title : data.msg  , icon : "none"  } );

@@ -53,10 +53,10 @@ export default class extends wepy.app {
 
       this.intercept("request",{
           config( p ){
-              let token = wx.getStorageSync("token");
+              let token = wx.getStorageSync("SID");
               if( token ) {
                   p.header = {
-                      cookie : `token=${token}`
+                      cookie : `SID=${token}`
                   }
               }
 
