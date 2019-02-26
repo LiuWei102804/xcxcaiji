@@ -53,8 +53,14 @@
     import { RPX } from "../util/info";
 
     export default class Local extends wepy.component{
+        props = {
+            locationList: {
+                type : Array ,
+                default : [] ,
+                twoWay : true
+            }
+        };
         data = {
-            locationList : [] ,
             maxHeight : 0 ,
             checked : -1 ,
             params : {
@@ -109,40 +115,8 @@
             }
 
         }
-        /*
-        *   手机号加密
-        * */
-        transformPhone( phone ){
-            let start = phone.substring(0,3);
-            let end = phone.substring( 7 );
-            return start + "****" + end;
-        }
-        /*
-        *   获取用户绑定的地址
-        * */
-        userLocation( params ){
-            const _this = this;
-            let { offset = 0 , limit = 10 } = params;
-            wepy.request({
-                url: "http://localhost:8999/location/query.json",
-                method : "GET" ,
-                data : _this.goodData ,
-                success : ( d ) => {
-                    let data = d.data;
-                    switch( data.code ) {
-                        case 200 :
-                            data.result.forEach( item => {
-                                item.phone = this.transformPhone( item.phone );
-                            })
-                            _this.locationList = _this.locationList.concat( data.result );
-                            _this.$apply();
-                            break;
-                        default :
 
-                    }
-                }
-            })
-        }
+
         onLoad(){
             const query = wx.createSelectorQuery();
             const _this = this;
@@ -151,7 +125,8 @@
                 _this.maxHeight = res[0].height - ( 98 * RPX );
                 _this.$apply();
             });
-            this.userLocation({ offset : 0 , limit : 10 });
+
+            console.log( this )
         }
 
     }

@@ -54,7 +54,7 @@
         </view>
     </label>
     <view class="local" animation="{{animationData}}" @tap="localHide({{ event }})" id="local">
-        <local></local>
+        <local :locationList.sync="locationList"></local>
     </view>
 
     <a class="publish_btn" @tap="publish()">发布</a>
@@ -67,6 +67,7 @@
 
     export default class Publish extends wepy.page {
         data = {
+            locationList : [] ,
             count : 5 ,
             animationData : {} ,
             useLocal : "" ,
@@ -125,8 +126,12 @@
             /*
             *   选择地址
             * */
-            useLocal(){
+            async useLocal(){
+                this.locationList.length = 0;
                 this.animationData = animate().translate("0%","0").step();
+                await this.userLocation({ offset : 0 , limit : 10 });
+
+                console.log("地址信息查询到了")
             } ,
             /*
             *   隐藏地址栏
@@ -183,7 +188,47 @@
                 let dataset = e.currentTarget.dataset;
                 this.goodData[dataset.name] = e.detail.value;
             } ,
+        }
+        /*
+        *   获取用户绑定的地址
+        * */
+        userLocation( params ){
+            const _this = this;
+            let { offset = 0 , limit = 10 } = params;
+            console.log("地址信息开始查询")
+            return new Promise((resolve , reject) => {
+                wepy.request({
+                    url: "http://localhost:8999/location/query.json",
+                    method : "GET" ,
+                    data : _this.goodData ,
+                    success : ( d ) => {
+                        let data = d.data;
+                        switch( data.code ) {
+                            case 200 :
+                                data.result.forEach( item => {
+                                    item.phone = _this.transformPhone( item.phone );
+                                });
+                                _this.locationList = _this.locationList.concat( data.result );
+                                _this.$apply();
+                                resolve("200");
+                                break;
+                            default :
 
+                        }
+                    } ,
+                    error : function ( err ) {
+                        reject( err );
+                    }
+                })
+            })
+        }
+        /*
+        *   手机号加密
+        * */
+        transformPhone( phone ){
+            let start = phone.substring(0,3);
+            let end = phone.substring( 7 );
+            return start + "****" + end;
         }
         saveData(){
             const _this = this;

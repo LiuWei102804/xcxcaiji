@@ -23,14 +23,14 @@
             i{ font-size:20px; float: right; margin-top: 7px; color: #666; }
         }
     }
-    .logout{ width: 90%; height: 80rpx; margin: 10px auto 0; border-radius: 10rpx; line-height: 80rpx; background: #FF5722; color: #fff; text-align: center; }
+    .logout{ width: 90%; height: 80rpx; margin: 10px auto 0; border-radius: 10rpx; line-height: 80rpx; background: #478c1e; color: #fff; text-align: center; }
 </style>
 <template>
     <view class="content">
         <view class="head flex flex_align flex_just">
-            <a class="user-img">
-                <open-data type="userAvatarUrl"></open-data>
-            </a>
+            <label class="user-img" @tap="goTo('../pages/user-info')">
+                <open-data type="userAvatarUrl" style="display: block"></open-data>
+            </label>
             <a>
                 <open-data  type="userNickName"></open-data>
             </a>
@@ -85,34 +85,44 @@
                 })
             } ,
             goTo( url ) {
+                console.log( url )
                 wx.navigateTo({
                     url : url
                 });
             } ,
             async logout(){
-                let d = await new Promise(( resolve , reject) => {
+                let confirm = await this.confirmQuit();
+                if( confirm == "ok" ) {
                     wepy.request({
                         url : "http://localhost:8999/user/logout.json" ,
                         success : res => {
-                            resolve("ok");
+                            wx.navigateTo({
+                                url : "/pages/index2"
+                            });
                         }
                     });
-                });
-
-                if( d == "ok" ) {
-                    wx.showModal({
-                        title: '提示',
-                        content: '这是一个模态弹窗',
-                        success(res) {
-                            if (res.confirm) {
-                                console.log('用户点击确定')
-                            } else if (res.cancel) {
-                                console.log('用户点击取消')
-                            }
-                        }
-                    })
                 }
+
+
+
+
+
             }
+        }
+        confirmQuit(){
+            return new Promise(( resolve , reject ) => {
+                wx.showModal({
+                    title: "提示",
+                    content: "确认退出吗？",
+                    success( res ) {
+                        if ( res.confirm ) {
+                            resolve( "ok" );
+                        } else if ( res.cancel ) {
+                            resolve("cancel");
+                        }
+                    }
+                })
+            })
         }
         onLoad(){
 
