@@ -187,8 +187,21 @@
                 }
             });
         };
+        /*
+        *   获取位置信息
+        * */
+        getLocation(){
+            wx.getLocation({
+                altitude : false ,
+                success : location => {
+                    console.log( location )
+                }
+            })
+        }
         onLoad (){
             this.hotProducts();
+            this.getLocation();
+            //this.$invoke('/' , "updateUserInfo" , { a : 20 });
         }
     }
 </script>

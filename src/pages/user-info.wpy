@@ -10,7 +10,7 @@
     .user_item{ width: 96%; padding: 10rpx 2%; background: #fff;margin-bottom: 2px; height: auto; align-items: center; -webkit-align-items: center;
         text{ width: 20%; flex: 2; -webkit-flex: 2; height: 60rpx; line-height:60rpx; }
         input{ font-size: 30rpx;  flex: 6; -webkit-flex: 6;  height: 60rpx; line-height: 60rpx;}
-        image{ width: 100rpx; height: 100rpx; border-radius: 50rpx; margin-right: 10px; }
+        image{ width: 100rpx; height: 100rpx; border-radius: 50rpx; margin-right: 10px; box-shadow: 0px 0px 5px 1px #ccc; -webkit-box-shadow: 0px 0px 5px 1px #ccc; background: #ccc; }
         .fa-angle-right{ font-size: 60rpx; color: #ccc; }
     }
     .add-btn{ display: block; bottom: 10rpx; width: 96%; height: 90rpx; line-height: 90rpx; background: #478c1e; color: #fff; padding: 0; border-radius: 10rpx; text-align: center; margin: 50rpx auto 0; }
@@ -46,7 +46,7 @@
     </label>
     <label class="user_item flex">
         <text>手机号：</text>
-        <input type="text" placeholder="" value="186****0989" disabled @input="setInput" />
+        <input type="text" placeholder="" value="{{ userInfo.account }}" disabled @input="setInput" />
         <i class="fa fa-angle-right"></i>
     </label>
     <a class="add-btn" @tap="save">保存</a>
@@ -72,12 +72,13 @@
 
 <script>
     import wepy from "wepy";
+    import User from "../components/user";
 
 
 
     export default class UserInfo extends wepy.page{
         data = {
-            userData : {} ,
+            userInfo : {} ,
             selectStatu : false ,
             currGender : { desc : "男" , val : 1  } ,
             gender : [{ desc : "男" , val : 1 },{ desc : "女" , val : 0 }] ,
@@ -88,6 +89,9 @@
                 real_name: "" ,
                 avatar : ""
             }
+        }
+        components = {
+            user : User
         }
         methods = {
             /*
@@ -128,6 +132,9 @@
             *   保存数据
             * */
             save(){
+
+                //this.$emit("a");
+                const _this = this;
                 let params = this.userDataParams;
                 wepy.request({
                     url : "http://localhost:8999/user/modify.json" ,
@@ -135,7 +142,15 @@
                     data : params ,
                     success : d => {
                         let data = d.data;
-                        wx.showToast({ title :data.msg , icon : "none"  } );
+                        wx.showToast({
+                            title :data.msg ,
+                            icon : "none" ,
+                            success : () => {
+                                setTimeout(() => {
+                                    _this.$broadcast("login", data.result )
+                                },1500);
+                            }
+                        });
 
                     }
                 })
@@ -192,15 +207,14 @@
             })
         }
         onLoad(){
-            let globalData = this.$parent.globalData.userInfo;
-            this.userDataParams.avatar = globalData.avatar;
-            this.userDataParams.nick_name = globalData.nick_name;
-            this.userDataParams.real_name = globalData.real_name;
-            this.userDataParams.gender = globalData.gender;
-            this.currGender = globalData.gender == 1 ? this.gender[0] : this.gender[1];
-            this.currIndex = globalData.gender == 1 ? 0 : 1;
+            this.userInfo = wx.getStorageSync("userInfo");
+            this.userDataParams.avatar = this.userInfo.avatar;
+            this.userDataParams.nick_name = this.userInfo.nick_name;
+            this.userDataParams.real_name = this.userInfo.real_name;
+            this.userDataParams.gender = this.userInfo.gender;
+            this.currGender = this.userInfo.gender == 1 ? this.gender[0] : this.gender[1];
+            this.currIndex = this.userInfo.gender == 1 ? 0 : 1;
 
-            console.log( this.$parent.globalData.userInfo )
         }
     }
 </script>

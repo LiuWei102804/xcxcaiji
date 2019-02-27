@@ -88,11 +88,9 @@
                         let data = d.data;
                         switch( data.code ) {
                             case 200 :
-                                _this.$emit("customHide" );
-                                _this.$root.$parent.globalData.userInfo = data.result;
-                                wx.setStorageSync( d.cookies[0].name , d.cookies[0].value )
-                                // wx.setStorageSync( "token" ,  data.result );
-                                // wx.setStorageSync( "account" ,  _this.sendCodeData.account );
+                                _this.$emit("customHide" , data.result );
+                                wx.setStorageSync( "userInfo" , data.result );
+                                wx.setStorageSync( d.cookies[0].name , d.cookies[0].value );
                                 break;
                             default :
                                 wx.showToast({ title : data.msg  , icon : "none"  } );

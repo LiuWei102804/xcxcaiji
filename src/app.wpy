@@ -27,8 +27,7 @@ setStore(store)
 export default class extends wepy.app {
   config = {
       pages: [
-
-          "pages/index2" ,
+          "pages/index" ,
           "pages/good" ,
           "pages/list" ,
           "pages/publish" ,
@@ -36,8 +35,12 @@ export default class extends wepy.app {
           "pages/user-location" ,
           "pages/add-location" ,
           "pages/user-info"
-
       ],
+      permission : {
+          "scope.userLocation" : {
+              "desc": "菜鸡想要获取您的位置信息"
+          }
+      } ,
       window: {
           backgroundTextStyle: 'light',
           navigationBarBackgroundColor: '#fff',
@@ -67,7 +70,6 @@ export default class extends wepy.app {
           }
       })
   }
-
 
   onLaunch() {
       this.testAsync();
