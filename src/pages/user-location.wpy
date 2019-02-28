@@ -34,7 +34,6 @@
 </template>
 <script>
     import wepy from "wepy";
-    import Transform from "../mixins/middlewares";
     import { WINHEIGHT , RPX } from "../util/info";
 
 
@@ -49,7 +48,6 @@
                 limit : 10
             }
         }
-        mixins = [Transform];
         components = {
 
         }

@@ -21,7 +21,7 @@
     import Shop from "../components/shop";
     import Foot from "../components/foot";
     import BindPhone from "../components/bind-phone";
-    import UserInfo from "../mixins/userInfo";
+    import UserInfo from "../mixins/httpOrigin";
     import { WINHEIGHT , RPX } from "../util/info";
 
     export default class Index2 extends wepy.page {
