@@ -34,7 +34,8 @@ export default class extends wepy.app {
           "pages/user-phone" ,
           "pages/user-location" ,
           "pages/add-location" ,
-          "pages/user-info"
+          "pages/user-info" ,
+          "pages/guess-location"
       ],
       permission : {
           "scope.userLocation" : {

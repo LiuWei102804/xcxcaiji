@@ -1,4 +1,7 @@
 <style lang="less">
+    .map{ width: 96%; height: 80rpx; line-height: 80rpx; padding: 0 2%; background: #fff; margin:0px 0 5px;
+        i{ font-size: 40rpx; color: #666; margin-right: 3px; }
+    }
     .header{
         overflow: hidden;
         image{
@@ -76,6 +79,7 @@
     }
 </style>
 <template>
+    <view class="map" @tap="toGuess"><i class="fa fa-map-marker"></i>{{ position }}</view>
     <view class="content">
         <view class="header">
             <image src="../images/banner.jpg"></image>
@@ -124,7 +128,6 @@
             </view>
         </repeat>
         <text class="more" @tap="toList(1)">查看更多</text>
-
     </view>
     <foot></foot>
 </template>
@@ -143,7 +146,8 @@
             toast: Toast
         }
         data = {
-            hots : []
+            hots : [] ,
+            position : "请稍后。。。"
         }
         methods = {
             toGood( id , userId ){
@@ -159,6 +163,11 @@
             toPublish() {
                 wx.navigateTo({
                     url : "/pages/publish"
+                });
+            } ,
+            toGuess(){
+                wx.navigateTo({
+                    url : "/pages/guess-location"
                 });
             }
         }
@@ -191,10 +200,22 @@
         *   获取位置信息
         * */
         getLocation(){
+            let status = "";
+            let result = null;
             wx.getLocation({
                 altitude : false ,
                 success : location => {
                     console.log( location )
+                    result = `${location.latitude},${location.longitude}`;
+                    status = "success";
+                } ,
+                fail : err => {
+                    status = "fail";
+                } ,
+                complete : () => {
+                    wx.navigateTo({
+                        url : `/pages/guess-location?statu=${status}&result=${result}`
+                    });
                 }
             })
         }

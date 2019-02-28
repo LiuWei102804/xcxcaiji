@@ -16,7 +16,7 @@
     }
 </style>
 <template>
-  <view class="panel">{{ title }}<i wx:if="icon" class="{{ icon }}"></i></view>
+    <view class="panel">{{ title }}<i wx:if="icon" class="{{ icon }}"></i></view>
 </template>
 <script>
   import wepy from 'wepy'
