@@ -149,6 +149,11 @@
             hots : [] ,
             position : "请稍后。。。"
         }
+        events = {
+            "login" : result => {
+                this.getLocation();
+            }
+        }
         methods = {
             toGood( id , userId ){
                 wx.navigateTo({
@@ -200,14 +205,16 @@
         *   获取位置信息
         * */
         getLocation(){
+            const _this = this;
             let status = "";
             let result = null;
             wx.getLocation({
-                altitude : false ,
+                altitude : true ,
                 success : location => {
-                    console.log( location )
+                    //_this.position = `${location.latitude},${location.longitude}`;
                     result = `${location.latitude},${location.longitude}`;
                     status = "success";
+                    _this.$apply();
                 } ,
                 fail : err => {
                     status = "fail";
@@ -221,8 +228,6 @@
         }
         onLoad (){
             this.hotProducts();
-            this.getLocation();
-            //this.$invoke('/' , "updateUserInfo" , { a : 20 });
         }
     }
 </script>

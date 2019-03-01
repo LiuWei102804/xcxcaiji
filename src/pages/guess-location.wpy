@@ -11,8 +11,11 @@
         a{ color: #01AAED; font-size: 12px; }
     }
     .location-other{
-        width: 96%; line-height: 60rpx; padding: 10px 2%; background: #fff; display: block; overflow: hidden; margin-bottom: 5px;
-        text{ background: #d3d3d3; padding: 3px 5px; margin-right: 5px; border-radius: 5px; color: #333; margin-bottom: 3px; display: block; float: left; }
+        width: 96%; line-height: 50rpx; padding: 10px 2%; background: #fff; display: block; overflow: hidden; margin-bottom: 5px;
+        text{ background: #d3d3d3; padding: 1px 3px; margin-right: 5px; border-radius: 5px; color: #333; margin-bottom: 5px; display: block; float: left; font-size: 12px; }
+    }
+    .search-list{ padding: 5px 2%; width: 96%; height: auto; background: #fff;
+        text{ display: block; font-size: 12px; border-bottom: 1px solid #ccc; line-height: 80rpx; height: 80rpx; color: #666; }
     }
     .panel {
         width: 96%;
@@ -36,18 +39,26 @@
     </view>
     <view class="location-item flex">
         <text>{{ location.formatted_address }}</text>
-        <a>重新定位</a>
+        <a @tap="resetPosition">重新定位</a>
+    </view>
+    <view class="search-list">
+        <repeat for="{{ searchResult }}">
+            <text>{{ item.name }}</text>
+        </repeat>
     </view>
     <view class="panel">周边</view>
-    <view class="location-other">
+    <view class="location-other" wx:if="{{ location.pois > 0 }}">
         <text>中行天盛广场</text>
         <text>中行天盛广场</text>
         <text>中行天盛广场</text>
         <text>中行天盛广场</text>
         <text>中行天盛广场</text>
     </view>
-    <view class="panel">历史记录</view>
-    <view style="text-align: center; background: #fff; padding-bottom: 5px;">
+    <view class="location-other" wx:if="{{ location.pois == 0 }}" style="color: #333;">
+        <i class="fa fa-warning">暂无数据</i>
+    </view>
+    <view class="panel" wx:if="{{ !Boolean(keyword) }}">历史记录</view>
+    <view style="text-align: center; background: #fff; padding-bottom: 5px;" wx:if="{{ searchHistory.length > 0 }}">
         <view class="location-other">
             <repeat for="{{searchHistory}}" item="item">
                 <text>{{ item.word }}</text>
@@ -55,6 +66,9 @@
 
         </view>
         <i class="fa fa-trash">清除记录</i>
+    </view>
+    <view class="location-other" wx:if="{{ searchHistory.pois == 0 }}" style="color: #333;">
+        <i class="fa fa-warning">暂无数据</i>
     </view>
 
 </template>
@@ -65,9 +79,12 @@
 
     export default class GuessLocation extends wepy.page{
         data = {
-            location : {} ,
+            location : {
+                pois : []
+            } ,
             keyword : "" ,
-            searchHistory : []
+            searchHistory : [] ,
+            searchResult : []
         }
         mixins = [HttpOrigin];
         components = {
@@ -94,19 +111,36 @@
                     } ,
                     success : d => {
                         let data = d.data;
-                        console.log( data )
+                        _this.searchResult = data.result.result;
                     } ,
                     complete : () => {
                         _this.getSearchHistory();
                     }
                 })
+            } ,
+            /*
+            *   重新定位
+            * */
+            resetPosition(){
+                const _this = this;
+                wx.getLocation({
+                    altitude : true ,
+                    success : location => {
+                        _this.changeLocation([location.latitude,location.longitude]);
+                    } ,
+                    fail : err => {
+                    } ,
+                    complete : () => {
+                    }
+                })
             }
-        }
+        };
         /*
         *   逆地理编码
         * */
         changeLocation( axis ){
             const _this = this;
+            wx.showLoading("加载中...");
             wepy.request({
                 url : `${_this.httpOrigin}/position/getLocation.json?lon=${axis[1]}&lat=${axis[0]}` ,
                 method : "GET" ,
@@ -119,6 +153,9 @@
                             break;
                         default :
                     }
+                } ,
+                complete : () => {
+                    wx.hideLoading();
                 }
             })
         }
@@ -135,12 +172,16 @@
                     let data = d.data;
                     switch( data.code ) {
                         case 200 :
-                            _this.searchHistory = data.result.keywords;
+                            if( data.result.keywords ) {
+                                _this.searchHistory = data.result.keywords;
+                            } else {
+                                _this.searchHistory = [];
+                            }
+
                             _this.$apply();
                             break;
                         default :
                     }
-                    console.log( data )
                 }
             });
         };
