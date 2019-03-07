@@ -21,10 +21,10 @@
     import Shop from "../components/shop";
     import Foot from "../components/foot";
     import BindPhone from "../components/bind-phone";
-    import UserInfo from "../mixins/httpOrigin";
+    import HttpOrigin from "@/mixins/httpOrigin";
     import { WINHEIGHT , RPX } from "../util/info";
 
-    export default class Index2 extends wepy.page {
+    export default class Index extends wepy.page {
         constructor(){
             super();
         }
@@ -35,7 +35,7 @@
             foot : Foot ,
             bindphone : BindPhone
         }
-        mixins = [UserInfo];
+        mixins = [HttpOrigin];
         data = {
             tabActive : 0 ,
             scrollHeight : 0 ,
@@ -45,7 +45,8 @@
 
         }
         watch = {
-
+            "tabActive" : ( newVal , oldVal ) => {
+            }
         }
         events = {
             "tab" : ( index ) => {
@@ -56,12 +57,14 @@
                 this.$broadcast("login", data );
             }
         }
-        onLoad() {
+        onLoad( params ) {
             this.autoLogin();
         }
         onShow(){
-
-
+            let posiStorage = wx.getStorageSync("postion");
+            if( posiStorage ) {
+                this.$broadcast("position", posiStorage );
+            };
         }
         autoLogin(){
             let _this = this;

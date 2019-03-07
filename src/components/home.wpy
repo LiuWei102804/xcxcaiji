@@ -79,8 +79,9 @@
     }
 </style>
 <template>
-    <view class="map" @tap="toGuess"><i class="fa fa-map-marker"></i>{{ position }}</view>
+
     <view class="content">
+        <view class="map" @tap="toGuess"><i class="fa fa-map-marker"></i>{{ position }}</view>
         <view class="header">
             <image src="../images/banner.jpg"></image>
         </view>
@@ -88,24 +89,24 @@
             <input type="text" placeholder="输入需要的商品" />
             <i class="fa fa-search"></i>
         </view>
-        <view class="flex dir">
-            <a class="flex flex_align flex_just" @tap="toList(1)" href="javascript:void(0)" style="color:#5FB878;">
-                <i class="fa fa-shopping-bag"></i>
-                2元店
-            </a>
-            <a class="flex flex_align flex_just" @tap="toList(2)" href="javascript:void(0)" style="color: #009688;">
-                <i class="fa fa-shopping-basket"></i>
-                3元店
-            </a>
-            <a class="flex flex_align flex_just" @tap="toList(3)" href="javascript:void(0)" style="color: #1E9FFF;">
-                <i class="fa fa-shopping-cart"></i>
-                5元店
-            </a>
-            <a class="flex flex_align flex_just" @tap="toList(4)" href="javascript:void(0)" style="color: #01AAED;">
-                <i class="fa fa-gift"></i>
-                10元店
-            </a>
-        </view>
+        <!--<view class="flex dir">-->
+            <!--<a class="flex flex_align flex_just" @tap="toList(1)" href="javascript:void(0)" style="color:#5FB878;">-->
+                <!--<i class="fa fa-shopping-bag"></i>-->
+                <!--2元店-->
+            <!--</a>-->
+            <!--<a class="flex flex_align flex_just" @tap="toList(2)" href="javascript:void(0)" style="color: #009688;">-->
+                <!--<i class="fa fa-shopping-basket"></i>-->
+                <!--3元店-->
+            <!--</a>-->
+            <!--<a class="flex flex_align flex_just" @tap="toList(3)" href="javascript:void(0)" style="color: #1E9FFF;">-->
+                <!--<i class="fa fa-shopping-cart"></i>-->
+                <!--5元店-->
+            <!--</a>-->
+            <!--<a class="flex flex_align flex_just" @tap="toList(4)" href="javascript:void(0)" style="color: #01AAED;">-->
+                <!--<i class="fa fa-gift"></i>-->
+                <!--10元店-->
+            <!--</a>-->
+        <!--</view>-->
         <view class="publish flex flex_align" @tap="toPublish()">
             <view class="flex">
                 <text>我要发布</text>
@@ -133,6 +134,7 @@
 </template>
 <script>
     import wepy from "wepy";
+    import HttpOrigin from "@/mixins/httpOrigin";
     import Panel from "@/components/panel";
     import Toast from "wepy-com-toast";
 
@@ -145,35 +147,36 @@
             panel: Panel ,
             toast: Toast
         }
+        mixins = [HttpOrigin];
         data = {
             hots : [] ,
-            position : "请稍后。。。"
+            position : "定位中..."
         }
         events = {
             "login" : result => {
-                this.getLocation();
+                let url = `/pages/guess-location`;
+                this.pageTo( url );
+            } ,
+            "position" : posi => {
+                this.position = posi;
             }
         }
         methods = {
             toGood( id , userId ){
-                wx.navigateTo({
-                    url : "/pages/good?id=" + id + "&userId=" + userId
-                });
+                let url = `/pages/good?id=${id}&userId=${userId}`;
+                this.pageTo(url);
             } ,
             toList( id ) {
-                wx.navigateTo({
-                    url : "/pages/list?shopId=" + id
-                });
+                let url = `/pages/list?id=${id}`;
+                this.pageTo(url);
             } ,
             toPublish() {
-                wx.navigateTo({
-                    url : "/pages/publish"
-                });
+                let url = `/pages/publish`;
+                this.pageTo(url);
             } ,
             toGuess(){
-                wx.navigateTo({
-                    url : "/pages/guess-location"
-                });
+                let url = `/pages/guess-location`;
+                this.pageTo(url);
             }
         }
         /*
@@ -204,28 +207,27 @@
         /*
         *   获取位置信息
         * */
-        getLocation(){
-            const _this = this;
-            let status = "";
-            let result = null;
-            wx.getLocation({
-                altitude : true ,
-                success : location => {
-                    //_this.position = `${location.latitude},${location.longitude}`;
-                    result = `${location.latitude},${location.longitude}`;
-                    status = "success";
-                    _this.$apply();
-                } ,
-                fail : err => {
-                    status = "fail";
-                } ,
-                complete : () => {
-                    wx.navigateTo({
-                        url : `/pages/guess-location?statu=${status}&result=${result}`
-                    });
-                }
-            })
-        }
+        // getLocation(){
+        //     const _this = this;
+        //     let status = "";
+        //     let result = null;
+        //     wx.getLocation({
+        //         altitude : true ,
+        //         success : location => {
+        //             //_this.position = `${location.latitude},${location.longitude}`;
+        //             result = `${location.latitude},${location.longitude}`;
+        //             status = "success";
+        //             _this.$apply();
+        //         } ,
+        //         fail : err => {
+        //             status = "fail";
+        //         } ,
+        //         complete : () => {
+        //             let url = `/pages/guess-location?statu=${status}&result=${result}`;
+        //             _this.pageTo( url );
+        //         }
+        //     })
+        // }
         onLoad (){
             this.hotProducts();
         }
