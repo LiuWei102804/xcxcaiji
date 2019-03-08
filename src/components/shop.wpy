@@ -5,6 +5,7 @@
         margin-top: 5px;
         background: #fff;
         width: 96%;
+        transform: translate(0rpx,0);
         .shop-item{
             width: 100%;
             height: 60px;
@@ -23,12 +24,28 @@
                     -webkit-box-orient: vertical;
                     color: #999;
                 }
-                .price{ position: absolute; bottom: 0; color: red;
-                    text{ font-size: 14px; }
+                .price{ margin-top: 20rpx; color: red; justify-content: space-around; -webkit-justify-content: space-around; flex-direction: row; -webkit-flex-direction: row;
+                    view:first-child{ font-size: 14px; flex: 3; }
+                    view:last-child{ font-size: 30rpx; color: #666; align-items: center; -webkit-align-items: center; justify-content:flex-end; -webkit-justify-content: flex-end;
+                        input{ width: 20%; text-align: center; margin: 0 10rpx; }
+                        i{ padding: 10rpx; }
+                    }
                 }
             }
         }
+        .remove{
+            width: 100rpx;
+            height: 80px;
+            line-height: 80px;
+            text-align: center;
+            color: #fff;
+            background: #FF5722;
+            position: absolute;
+            right: -100rpx;
+            top:0px;
+        }
     }
+    /*.right{ animation: scrolltoupper .3s ease; }*/
     .shop-balance{
         position: fixed;
         bottom: 45px;
@@ -50,24 +67,35 @@
                 .small{ font-size: 13px; margin: 0; color: #000; }
             }
         }
-
     }
     /* fa-circle-thin  */
 </style>
 <template>
     <view class="content" style="padding-bottom: 40px">
-        <repeat for="{{ shopItems }}" item="item" index="index">
-            <view class="shop-data">
-                <label class="shop-item flex flex_align">
-                    <i class="checkbox fa {{ item.checked ? 'fa-check-circle' : 'fa-circle-thin' }}" @tap="checkItem({{ index }})"></i>
-                    <image src="{{ item.goodUrl }}"></image>
-                    <view class="shop-info flex">
-                        <p>{{ item.name }}</p>
-                        <text class="price">￥<text>{{ item.price }}</text></text>
+            <repeat for="{{ shopCar.shopcar_goods }}" item="item" index="index">
+                <scroll-view scroll-x="true" @scrolltoupper="scrolltoupper" @scrolltolower="scrolltolower" upper-threshold="10" lower-threshold="10">
+                    <view class="shop-data {{ rightLine ? 'right' : 'left' }}">
+                        <label class="shop-item flex flex_align">
+                            <i class="checkbox fa {{ item.checked ? 'fa-check-circle' : 'fa-circle-thin' }}" @tap="checkItem({{ index }})"></i>
+                            <image @tap="loadGood({{ item._id }},{{ item.user_id }})" src="{{ item.pics[0] }}"></image>
+                            <view class="shop-info flex">
+                                <p @tap="loadGood({{ item._id }},{{ item.user_id }})">{{ item.name }}</p>
+                                <view class="price flex">
+                                    <view>￥{{ item.price }}</view>
+                                    <view class="flex">
+                                        <i class="fa fa-minus" @tap="minus({{ item }},{{ index }})"></i>
+                                        <input type="number" value="{{ item.count }}" />
+                                        <i class="fa fa-plus" @tap="plus({{ item }},{{ index }})"></i>
+                                    </view>
+                                </view>
+                            </view>
+                        </label>
+                        <view class="remove">删除</view>
                     </view>
-                </label>
-            </view>
-        </repeat>
+                </scroll-view>
+            </repeat>
+
+
         <view class="shop-balance flex flex_align">
             <label style="flex: 1; -webkit-flex:1;">
                 <i class="checkbox fa {{ totalChecked ? 'fa-check-circle' : 'fa-circle-thin' }}" @tap="checkAll()"></i>
@@ -75,7 +103,7 @@
             </label>
             <label class="flex flex_align" style="flex: 3; -webkit-flex:3;">
                 <text><text class="small">合:￥</text> {{ totalPrice }}</text>
-                <a>结算</a>
+                <a @tap="subOrder">结算</a>
             </label>
 
         </view>
@@ -83,6 +111,7 @@
 </template>
 <script>
     import wepy from "wepy";
+    import HttpOrigin from "@/mixins/httpOrigin";
 
 
 
@@ -92,22 +121,22 @@
             totalChecked : false ,
             scrollHeight : 0 ,
             checkNum : 0 ,
-            shopItems : [
-                { price : 2199.00 , long : "300m" , author : "黄贱贱" , name : "荣耀10 GT游戏加速 AIS手持夜景 6GB+64GB 幻夜黑 全网通 移动联通电信4G 双卡双待 游戏手机" , goodUrl : "../images/yu3.jpg" }
-            ]
+            shopCar : {} ,
+            rightLine : false
         }
+        mixins = [HttpOrigin];
         methods = {
             checkItem( index ) {                //选中某一项
-                this.shopItems[index].checked = !this.shopItems[index].checked;
+                this.shopCar.shopcar_goods[index].checked = !this.shopCar.shopcar_goods[index].checked;
 
-                if( this.shopItems[index].checked ) {
+                if( this.shopCar.shopcar_goods[index].checked ) {
                     this.checkNum ++;
-                    this.totalPrice = Number( ( this.totalPrice + Number( this.shopItems[index].price ) ).toFixed(2) );
+                    this.totalPrice = Number( ( +this.totalPrice + this.shopCar.shopcar_goods[index].price * this.shopCar.shopcar_goods[index].count  ) ).toFixed(2);
                 } else {
                     this.checkNum --;
-                    this.totalPrice = Number( ( this.totalPrice - Number( this.shopItems[index].price ) ).toFixed(2) );
+                    this.totalPrice = Number( ( +this.totalPrice - this.shopCar.shopcar_goods[index].price * this.shopCar.shopcar_goods[index].count  ) ).toFixed(2);
                 }
-                if( this.checkNum >= this.shopItems.length ) {
+                if( this.checkNum >= this.shopCar.shopcar_goods.length ) {
                     this.totalChecked = true;
                 } else {
                     this.totalChecked = false;
@@ -116,19 +145,154 @@
             checkAll(){                         //选中所有
                 this.totalChecked = !this.totalChecked;
                 if( this.totalChecked ) {
-                    this.shopItems.forEach( ( item , index ) => {
-                        this.shopItems[index].checked = true;
+                    this.shopCar.shopcar_goods.forEach( ( item , index ) => {
+                        this.shopCar.shopcar_goods[index].checked = true;
                         this.totalPrice = Number( ( this.totalPrice + Number( item.price ) ).toFixed(2) );
                     })
-                    this.checkNum = this.shopItems.length;
+                    this.checkNum = this.shopCar.shopcar_goods.length;
                 } else {
-                    this.shopItems.forEach( ( item , index ) => {
-                        this.shopItems[index].checked = false;
+                    this.shopCar.shopcar_goods.forEach( ( item , index ) => {
+                        this.shopCar.shopcar_goods[index].checked = false;
                     });
                     this.totalPrice = 0;
                     this.checkNum = 0;
                 }
+            } ,
+            /*
+            *   跳转商品页
+            * */
+            loadGood( id , userId ){
+                let url = `/pages/good?id=${id}&userId=${userId}`;
+                this.pageTo( url );
+            } ,
+            /*
+            *   数量增加
+            * */
+            async plus( item , index ){
+                item.count ++;
+                let result = await this.changeCount( item._id , item.count );
+                if( result.code == 200 ) {
+                    if( item.checked ) {
+                        this.totalPrice = ( +this.totalPrice + +item.price ).toFixed(2);
+                    }
+                    this.shopCar.shopcar_goods[index] = item;
+                    this.$apply();
+                } else {
+                    wx.showToast({ title : result.msg });
+                }
+            } ,
+            /*
+            *   数量减少
+            * */
+            async minus( item , index){
+                if( item.count - 1 < 1 ) {
+                    return;
+                }
+                item.count = item.count - 1;
+                let result = await this.changeCount( item._id , item.count );
+                if( result.code == 200 ) {
+                    if( item.checked ) {
+                        this.totalPrice = ( +this.totalPrice - +item.price ).toFixed(2);
+                    }
+                    this.shopCar.shopcar_goods[index] = item;
+                    this.$apply();
+                } else {
+                    wx.showToast({ title : result.msg })
+                }
+            } ,
+            /*
+            *   滚动组件
+            * */
+            scrolltoupper( e ){
+
+            } ,
+            scrolltolower( e ){
+
+            } ,
+            /*
+            *   提交订单
+            * */
+            subOrder(){
+                const _this = this;
+                if( this.checkNum == 0 ) {
+                    return;
+                };
+                let checks = _this.shopCar.shopcar_goods.filter( item => item.checked == true );
+                _this.showLoading();
+                wepy.request({
+                    url : `${this.httpOrigin}/order/place.json` ,
+                    method : "POST" ,
+                    data : {
+                        goods : checks
+                    } ,
+                    success : d => {
+                        let data = d.data;
+                        switch ( data.code ) {
+                            case 200 :
+                                _this.pageTo(`/pages/order`);
+                                break;
+                            default :
+                                wx.showToast({ title : data.msg });
+                        }
+                    } ,
+                    error : e => {
+
+                    } ,
+                    complete : () => {
+                        _this.hideLoading();
+                    }
+                })
+                console.log( checks )
             }
+        }
+        /*
+        *   编辑购物车数量
+        * */
+        changeCount( id , count ){
+            const _this = this;
+            _this.showLoading();
+            return new Promise((resolve , reject) => {
+                wepy.request({
+                    url : `${this.httpOrigin}/shop/changeCount.json` ,
+                    method : "GET" ,
+                    data : {
+                        id ,
+                        count
+                    } ,
+                    success : d => {
+                        resolve( d.data );
+                    } ,
+                    error : e => {
+
+                    } ,
+                    complete : () => {
+                        _this.hideLoading();
+                    }
+                })
+            })
+        }
+        /*
+        *   购物车数据
+        * */
+        shopCarData(){
+            const _this = this;
+            this.showLoading();
+            wepy.request({
+                url : `${this.httpOrigin}/shop/shopcar.json` ,
+                method : "GET" ,
+                success : d => {
+                    let data = d.data;
+                    _this.shopCar = data.result;
+                    _this.$apply();
+                } ,
+                complete : () => {
+                    _this.hideLoading();
+                }
+            })
+        }
+
+        onLoad(){
+            this.shopCarData();
         }
     }
 </script>

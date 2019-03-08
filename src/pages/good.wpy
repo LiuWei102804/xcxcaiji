@@ -19,6 +19,7 @@
             margin-bottom: 10px;
             .price{ color: red; font-size: 12px;
                 text{ font-size: 14px; }
+                .sales-volume{ font-size: x-small; color: #666; margin-left: 30rpx; }
             }
             .add{ font-size: 24px; color: #666; text-align: right; }
         }
@@ -38,55 +39,135 @@
                     .price{ color: red; font-size: 12px; justify-content: space-between; -webkit-justify-content: space-between;
                         text{ font-size: 14px;  }
                         .add{ color: #666; font-size: 16px; }
+
                     }
                 }
             }
         }
     }
+
+    .mask{
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        display: flex;
+        display: -webkit-flex;
+        justify-content: center;
+        -webkit-justify-content: center;
+        align-items: center;
+        -webkit-align-items: center;
+        background: rgba(0,0,0,0.5);
+
+
+        .add_to_car{
+            padding: 50rpx;
+            box-shadow: 0px 0px 5px 1px #ccc;
+            position: fixed;
+            width: 50%;
+            height: 200rpx;
+            top: 30%;
+            left: 20%;
+            background:#fff;
+            text-align: center;
+            .fa-close{
+                font-size: 40rpx;
+                position: absolute;
+                right:20rpx ;
+                top: 10rpx;
+            }
+            .title{
+                font-weight: bolder;
+            }
+            .change{
+                display: flex;
+                display: -webkit-flex;
+                margin-top: 20rpx;
+                justify-content: center;
+                -webkit-justify-content: center;
+                text{ font-size: 40rpx; line-height: 50rpx; }
+                input{width:200rpx;
+                    border:1px solid #ccc;
+                    margin:0 15rpx;
+                    padding: 0 20rpx;
+                }
+            }
+            a{ background: none;  display: block; margin-top: 30rpx; width: 100%; -webkit-tap-highlight-color: rgba(0,0,0,0); height: 80rpx; line-height: 80rpx; border:1px solid #ccc; border-radius: 10rpx;
+            }
+        }
+    }
+
 </style>
 <template>
-    <swiper indicator-dots="true" autoplay="true" interval="3000" duration="600" circular="true">
-        <repeat for="{{ good.pics }}" item="item" key="index">
-            <block>
-                <swiper-item style="width: 100%; height: 100%; overflow: hidden;">
-                    <!--<navigator url="{{item.link}}" hover-class="navigator-hover">-->
-                        <image src="{{item}}" class="slide-image" style="width: 100%; height: 180px;" />
-                    <!--</navigator>-->
-                </swiper-item>
-            </block>
-        </repeat>
-    </swiper>
-    <view class="page">
-        <label class="good-name">
-            <text class="title">{{ good.name }}</text>
-            <p class="desc">{{ good.describe }}</p>
-        </label>
-        <label class="flex flex_align shop">
-            <p class="price">￥<text>{{ good.price }}</text></p>
-            <a class="add"><i class="fa fa-cart-plus"></i></a>
-        </label>
+    <view class="content">
+        <swiper indicator-dots="true" autoplay="true" interval="3000" duration="600" circular="true">
+            <repeat for="{{ good.pics }}" item="item" key="index">
+                <block>
+                    <swiper-item style="width: 100%; height: 100%; overflow: hidden;">
+                        <!--<navigator url="{{item.link}}" hover-class="navigator-hover">-->
+                            <image src="{{item}}" class="slide-image" style="width: 100%; height: 180px;" />
+                        <!--</navigator>-->
+                    </swiper-item>
+                </block>
+            </repeat>
+        </swiper>
+        <view class="page">
+            <label class="good-name">
+                <text class="title">{{ good.name }}</text>
+                <p class="desc">{{ good.describe }}</p>
+            </label>
+            <label class="flex flex_align shop">
+                <p class="price">
+                    <text>￥{{ good.price }}</text>
+                    <text class="sales-volume">销量:{{ good.sales_volume }}</text>
+                </p>
+                <a class="add" @tap="addToCar({{ good }})"><i class="fa fa-cart-plus"></i></a>
+            </label>
 
-        <a class="user"><i class="fa fa-user-circle"></i>{{ userInfo.nick_name }} 发表于{{ good.fmtCreatedAt }}小时前</a>
+            <a class="user"><i class="fa fa-user-circle"></i>{{ userInfo.nick_name }} 发表于{{ good.fmtCreatedAt }}小时前</a>
 
-        <view class="more">
-            <text class="has">该用户还有</text>
-            <view class="other">
-                <repeat for="{{ otherData }}" item="item">
-                    <label>
-                        <image src="{{ item.pics[0] }}"></image>
-                        <text class="name">{{ item.name }}</text>
-                        <p class="price flex flex_align">
-                            <a>￥<text>{{ item.price }}</text></a>
-                            <a class="add"><i class="fa fa-cart-plus"></i></a>
-                        </p>
-                    </label>
-                </repeat>
+            <view class="more">
+                <text class="has">该用户还有</text>
+                <view class="other">
+                    <repeat for="{{ otherData }}" item="item">
+                        <label @tap="loadGood({{ item }})">
+                            <image src="{{ item.pics[0] }}"></image>
+                            <text class="name">{{ item.name }}</text>
+                            <p class="price flex flex_align">
+                                <a>￥<text>{{ item.price }}</text></a>
+                                <text class="add"><i class="fa fa-cart-plus"></i></text>
+                            </p>
+                        </label>
+                    </repeat>
+                </view>
+            </view>
+        </view>
+
+        <view class="mask" wx:if="{{addFlag}}">
+
+
+            <!-- 添加购物车弹窗 -->
+            <view class="add_to_car">
+                <!-- 右上角XX -->
+                <i class="fa fa-close" @tap="closeDialog"></i>
+                <view class="title">添加到购物车</view>
+                <view class="change">
+                    <text class="fa fa-minus" @tap="minusCount"></text>
+                    <input type="number" value="{{count}}" data-name="count" @input="setInput" />
+                    <text class="fa fa-plus" @tap="plusCount"></text>
+                </view>
+                <a href="javascript:void(0)" @tap="confirmData">确认</a>
             </view>
         </view>
     </view>
 </template>
 <script>
     import wepy from "wepy";
+    import HttpOrigin from "@/mixins/httpOrigin";
+
 
     export default class Good extends wepy.page{
         // constructor(){
@@ -97,7 +178,89 @@
                 pics : []
             } ,
             userInfo : {} ,
-            otherData : []
+            otherData : [] ,
+            count : 1 ,
+            addFlag : false
+        }
+        mixins = [HttpOrigin];
+        methods = {
+            /*
+            *   查询商品
+            * */
+            loadGood( item ){
+                this.getProductById( item._id );
+            } ,
+            /*
+            *   添加购物车
+            * */
+            addToCar( item ){
+                this.addFlag = true;
+            } ,
+            /*
+            *   设置输入框
+            * */
+            setInput( e ){
+                let dataset = e.currentTarget.dataset;
+                this[dataset.name] = e.detail.value;
+            } ,
+            /*
+            *   添加数量
+            * */
+            plusCount(){
+                this.count ++;
+            } ,
+            /*
+            *   减少数量
+            * */
+            minusCount(){
+                this.count = this.count - 1 < 0 ? 0 : this.count - 1;
+            } ,
+            /*
+            *   确认数量
+            * */
+            confirmData(){
+                const _this = this;
+                let { _id } = this.good;
+                if( _this.count == 0 ) {
+                    _this.addFlag = false;
+                    return;
+                }
+                _this.showLoading();
+                wepy.request({
+                    url : `${this.httpOrigin}/shop/add.json` ,
+                    method : "GET" ,
+                    data : {
+                        id : _id ,
+                        count : _this.count
+                    } ,
+                    success : d => {
+                        let data = d.data;
+                        switch( data.code ) {
+                            case 200 :
+                                _this.addFlag = false;
+                                _this.$apply();
+                                break;
+                            default :
+
+                        }
+                        wx.showToast({ title : data.msg });
+                    } ,
+                    error : e => {
+
+                    } ,
+                    complete : () => {
+
+                        _this.hideLoading();
+                    }
+                })
+
+            } ,
+            /*
+            *   关闭弹窗
+            * */
+            closeDialog(){
+                this.addFlag = false;
+            }
         }
         /*
         *   计算时间
@@ -114,7 +277,7 @@
         getProductById( id ){
             const _this = this;
             wepy.request({
-                url : "http://localhost:8999/product/getProductById.json" ,
+                url : `${this.httpOrigin}/product/getProductById.json` ,
                 type : "GET" ,
                 data : {
                     id : id
@@ -126,7 +289,6 @@
                             data.result.fmtCreatedAt = _this.calculationTime( data.result.createdAt );
 
                             _this.good = data.result;
-                            console.log(_this.good  )
                             _this.$apply();
                             break;
                         default :
@@ -166,9 +328,12 @@
             })
         }
         onLoad( option ){
-            this.userInfo = this.$parent.globalData.userInfo;
             this.getProductById( option.id );
             this.getProductByUser( option.userId );
+        }
+        onShow(){
+            this.userInfo = wx.getStorageSync("userInfo");
+
         }
     }
 </script>

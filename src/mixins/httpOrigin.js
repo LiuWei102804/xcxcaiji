@@ -8,16 +8,26 @@ export default class HttpOrigin extends wepy.mixin {
     methods = {
 
     }
+    /*
+    *   页面跳转
+    * */
     pageTo( page ) {
         wx.navigateTo({
             url : page
         });
     }
-    setData( key , data ){
-        this[key] = data;
-        console.log( this[key])
+    /*
+    *   loading加载
+    * */
+    showLoading( title = "加载中..." ){
+        wx.showLoading({
+            title : title
+        });
     }
-    getData( key ){
-        return this[key];
+    /*
+    *   hideLoading
+    * */
+    hideLoading(){
+        wx.hideLoading();
     }
 }

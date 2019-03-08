@@ -154,8 +154,8 @@
         }
         events = {
             "login" : result => {
-                let url = `/pages/guess-location`;
-                this.pageTo( url );
+                // let url = `/pages/guess-location`;
+                // this.pageTo( url );
             } ,
             "position" : posi => {
                 this.position = posi;

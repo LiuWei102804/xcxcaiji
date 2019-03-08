@@ -60,7 +60,7 @@
     <view class="location-other" wx:if="{{ location.pois == 0 }}" style="color: #333;">
         <i class="fa fa-warning">暂无数据</i>
     </view>
-    <view class="panel" wx:if="{{ !Boolean(keyword) }}">历史记录</view>
+    <view class="small-title" wx:if="{{ !Boolean(keyword) }}">历史记录：</view>
     <view style="text-align: center; background: #fff; padding-bottom: 5px;" wx:if="{{ searchHistory.length > 0 }}">
         <view class="location-other">
             <repeat for="{{searchHistory}}" item="item">
@@ -218,9 +218,9 @@
                     let data = d.data;
                     switch( data.code ) {
                         case 200 :
-                            if( data.result.keywords ) {
+                            try{
                                 _this.searchHistory = data.result.keywords;
-                            } else {
+                            } catch ( e ) {
                                 _this.searchHistory = [];
                             }
 

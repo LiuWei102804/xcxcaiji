@@ -70,11 +70,16 @@
             let _this = this;
             wx.showLoading("加载中...");
             wepy.request({
-                url: "http://localhost:8999/user/isLogin.json",
+                url: `${this.httpOrigin}/user/isLogin.json`,
                 method : "GET" ,
                 success : function ( data ) {
                     switch( data.data.code ) {
                         case 200 :
+                            if( wx.getStorageSync("position" ) == null ) {
+                                let url = `/pages/guess-location`;
+                                _this.pageTo( url );
+                            }
+
                             _this.$broadcast("login", data.data.result );
                             wx.setStorageSync("userInfo" , data.data.result );
                             break;
