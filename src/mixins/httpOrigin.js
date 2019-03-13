@@ -30,4 +30,34 @@ export default class HttpOrigin extends wepy.mixin {
     hideLoading(){
         wx.hideLoading();
     }
+    /*
+    *   提示框
+    * */
+    toast( msg ){
+        wx.showToast({ title : msg , icon : "none" });
+    }
+    /*
+    *   成功toast
+    * */
+    succToast( msg ){
+        wx.showToast({ title : msg , icon : "success" });
+    }
+    /*
+    *   确认弹窗
+    * */
+    confirmModal( msg ){
+        return new Promise(( resolve , reject ) => {
+            wx.showModal({
+                title: "提示",
+                content: msg ,
+                success( res ) {
+                    if ( res.confirm ) {
+                        resolve( "ok" );
+                    } else if ( res.cancel ) {
+                        resolve("cancel");
+                    }
+                }
+            })
+        })
+    }
 }

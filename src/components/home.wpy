@@ -57,14 +57,18 @@
                     text{ font-size: 14px; }
                 }
                 .user{
-                    i{
+                    image{
                         margin-right: 5px;
+                        width: 46rpx;
+                        height: 46rpx;
+                        border-radius: 23rpx;
                     }
                 }
             }
 
         }
     }
+
     .more{ text-align: center; display: block; height: 80rpx; line-height: 80rpx; color: #999; font-size: 12px; }
     .search{ width: 96%; padding: 5px 2%;  background: #fff; margin: 20rpx 0; font-size: 13px; position: relative;
         input{ width: 72%; display: block; height: 30px; border-radius: 15px; border: 1px solid #ccc; margin: 0 auto; padding: 0 10% 0 8%; font-size: 13px; }
@@ -86,8 +90,8 @@
             <image src="../images/banner.jpg"></image>
         </view>
         <view class="search">
-            <input type="text" placeholder="输入需要的商品" />
-            <i class="fa fa-search"></i>
+            <input type="text" confirm-type="search" @confirm="search" placeholder="输入需要的商品" data-name="keyword" @input="setInput" />
+            <i class="fa fa-search" @tap="search"></i>
         </view>
         <!--<view class="flex dir">-->
             <!--<a class="flex flex_align flex_just" @tap="toList(1)" href="javascript:void(0)" style="color:#5FB878;">-->
@@ -114,21 +118,30 @@
             </view>
             <i class="fa fa-location-arrow"></i>
         </view>
-        <panel title="热卖商品"></panel>
-        <repeat for="{{hots}}" item="item">
-            <view class="hot flex flex_align">
-                <image src="{{item.pics[0]}}"></image>
-                <label class="flex">
-                    <text class="text" @tap="toGood({{ item._id }},{{ item.user_id }})">{{ item.name }}</text>
-                    <view class="other flex flex_align">
-                        <text class="price">￥<text>{{ item.price }}</text></text>
-                        <a class="user"><i class="fa fa-user-circle"></i>{{ item.user_nick_name }}</a>
-                        <!--<a class="long">{{ item.long }}</a>-->
+        <view>
+            <panel title="热卖商品"></panel>
+            <block wx:if="{{hots.length > 0}}">
+                <repeat for="{{hots}}" item="item">
+                    <view class="hot flex flex_align">
+                        <image src="{{item.pics[0]}}"></image>
+                        <label class="flex">
+                            <text class="text" @tap="toGood({{ item._id }},{{ item.seller._id }})">{{ item.name }}</text>
+                            <view class="other flex flex_align">
+                                <text class="price">￥<text>{{ item.price }}</text></text>
+                                <a class="user flex flex_align"><image src="{{ item.seller.avatar }}" class="seller_avatar"></image>{{ item.seller.nick_name }}</a>
+                                <!--<a class="long">{{ item.long }}</a>-->
+                            </view>
+                        </label>
                     </view>
-                </label>
-            </view>
-        </repeat>
-        <text class="more" @tap="toList(1)">查看更多</text>
+                </repeat>
+            </block>
+            <block wx:if="{{hots.length == 0}}">
+                <empty></empty>
+            </block>
+
+            <text class="more" @tap="toList(1)">查看更多</text>
+        </view>
+
     </view>
     <foot></foot>
 </template>
@@ -136,6 +149,7 @@
     import wepy from "wepy";
     import HttpOrigin from "@/mixins/httpOrigin";
     import Panel from "@/components/panel";
+    import Empty from "@/components/empty";
     import Toast from "wepy-com-toast";
 
 
@@ -145,12 +159,14 @@
         }
         components = {
             panel: Panel ,
-            toast: Toast
+            toast: Toast ,
+            empty : Empty
         }
         mixins = [HttpOrigin];
         data = {
             hots : [] ,
-            position : "定位中..."
+            position : "定位中..." ,
+            keyword : ""
         }
         events = {
             "login" : result => {
@@ -177,6 +193,14 @@
             toGuess(){
                 let url = `/pages/guess-location`;
                 this.pageTo(url);
+            } ,
+            search(){
+                let url = `/pages/list?word=${this.keyword}`;
+                this.pageTo( url );
+            } ,
+            setInput( e ){
+                let attr = e.dataset.name;
+                this[attr] =  e.detail.value;
             }
         }
         /*
@@ -195,7 +219,7 @@
                     let data = d.data;
                     switch( data.code ) {
                         case 200 :
-                            _this.hots = _this.hots.concat( data.result );
+                            _this.hots = data.result;
                             _this.$apply();
                             break;
                         default :

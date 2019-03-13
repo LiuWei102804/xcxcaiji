@@ -50,18 +50,34 @@
         }
         events = {
             "tab" : ( index ) => {
+                switch( Number( index ) ) {
+                    case 0 :
+                        this.$invoke("home","hotProducts");
+                        break;
+                    case 1 :
+                        this.$invoke("shop","shopCarData");
+                        break;
+                    case 2 :
+                        //this.$invoke("user","shopCarData");
+                        break;
+                }
                 this.tabActive = index;
             } ,
             "customHide" : ( data ) => {
                 this.isLogin = true;
-                this.$broadcast("login", data );
+                if( !Boolean( wx.getStorageSync("position") ) ) {
+                    console.log(11111)
+                    let url = `/pages/guess-location`;
+                    this.pageTo( url );
+                }
+                //this.$broadcast("login", data );
             }
         }
         onLoad( params ) {
             this.autoLogin();
         }
         onShow(){
-            let posiStorage = wx.getStorageSync("postion");
+            let posiStorage = wx.getStorageSync("position");
             if( posiStorage ) {
                 this.$broadcast("position", posiStorage );
             };
@@ -75,7 +91,7 @@
                 success : function ( data ) {
                     switch( data.data.code ) {
                         case 200 :
-                            if( wx.getStorageSync("position" ) == null ) {
+                            if( !Boolean( wx.getStorageSync("position") ) ) {
                                 let url = `/pages/guess-location`;
                                 _this.pageTo( url );
                             }
@@ -86,7 +102,7 @@
                         default :
                             _this.isLogin = false;
                             _this.$apply();
-                            wx.showToast({ title :data.data.msg , icon : "none"  } );
+                            _this.toast( data.data.msg );
                     }
 
                 } ,

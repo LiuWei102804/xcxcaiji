@@ -27,6 +27,7 @@ setStore(store)
 export default class extends wepy.app {
   config = {
       pages: [
+
           "pages/index" ,
           "pages/good" ,
           "pages/list" ,
@@ -37,7 +38,8 @@ export default class extends wepy.app {
           "pages/user-info" ,
           "pages/guess-location" ,
           "pages/search-location" ,
-          "pages/order"
+          "pages/order" ,
+          "pages/storehouse"
       ],
       permission : {
           "scope.userLocation" : {
@@ -49,6 +51,7 @@ export default class extends wepy.app {
           navigationBarBackgroundColor: '#fff',
           navigationBarTitleText: '小商品市场',
           navigationBarTextStyle: 'black'
+          //navigationStyle : "custom"
       }
   }
 

@@ -72,6 +72,7 @@
 </style>
 <template>
     <view class="content" style="padding-bottom: 40px">
+        <block wx:if="{{ shopCar.shopcar_goods.length > 0 }}">
             <repeat for="{{ shopCar.shopcar_goods }}" item="item" index="index">
                 <scroll-view scroll-x="true" @scrolltoupper="scrolltoupper" @scrolltolower="scrolltolower" upper-threshold="10" lower-threshold="10">
                     <view class="shop-data {{ rightLine ? 'right' : 'left' }}">
@@ -94,7 +95,11 @@
                     </view>
                 </scroll-view>
             </repeat>
+        </block>
 
+        <block wx:if="{{ shopCar.shopcar_goods.length == 0 }}">
+            <empty></empty>
+        </block>
 
         <view class="shop-balance flex flex_align">
             <label style="flex: 1; -webkit-flex:1;">
@@ -111,6 +116,7 @@
 </template>
 <script>
     import wepy from "wepy";
+    import Empty from "@/components/empty";
     import HttpOrigin from "@/mixins/httpOrigin";
 
 
@@ -121,10 +127,20 @@
             totalChecked : false ,
             scrollHeight : 0 ,
             checkNum : 0 ,
-            shopCar : {} ,
+            shopCar : {
+                shopcar_goods : []
+            } ,
             rightLine : false
         }
         mixins = [HttpOrigin];
+        events = {
+            "login" : () => {
+                //this.shopCarData();
+            }
+        }
+        components = {
+            empty : Empty
+        }
         methods = {
             checkItem( index ) {                //选中某一项
                 this.shopCar.shopcar_goods[index].checked = !this.shopCar.shopcar_goods[index].checked;
@@ -147,8 +163,8 @@
                 if( this.totalChecked ) {
                     this.shopCar.shopcar_goods.forEach( ( item , index ) => {
                         this.shopCar.shopcar_goods[index].checked = true;
-                        this.totalPrice = Number( ( this.totalPrice + Number( item.price ) ).toFixed(2) );
-                    })
+                        this.totalPrice = ( +this.totalPrice + +item.price ).toFixed(2);
+                    });
                     this.checkNum = this.shopCar.shopcar_goods.length;
                 } else {
                     this.shopCar.shopcar_goods.forEach( ( item , index ) => {
@@ -282,7 +298,11 @@
                 method : "GET" ,
                 success : d => {
                     let data = d.data;
-                    _this.shopCar = data.result;
+                    if( data.result ) {
+                        _this.shopCar = data.result;
+                    } else {
+                        _this.shopCar = { shopcar_goods : [] };
+                    }
                     _this.$apply();
                 } ,
                 complete : () => {
@@ -292,7 +312,7 @@
         }
 
         onLoad(){
-            this.shopCarData();
+
         }
     }
 </script>

@@ -121,7 +121,7 @@
             *   选择当前地址
             * */
             setLocation(){
-                wx.setStorageSync("postion" , this.location.formatted_address );
+                wx.setStorageSync("position" , this.location.formatted_address );
                 wx.navigateBack({delta : 1});
             } ,
             /*

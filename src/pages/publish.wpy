@@ -28,6 +28,9 @@
         <input type="text" data-name="name" placeholder="请输入商品名称" @input="setInput" />
     </label>
     <label class="publish_item">
+        <input type="text" data-name="sub_name" placeholder="请输入商品副标题" @input="setInput" />
+    </label>
+    <label class="publish_item">
         <input type="number" data-name="price" placeholder="请输入商品价格" @input="setInput" />
     </label>
     <label class="publish_item">
@@ -61,6 +64,7 @@
 </template>
 <script>
     import wepy from "wepy";
+    import HttpOrigin from "@/mixins/httpOrigin";
     import animate from "../util/animate";
     import Local from "../components/location";
 
@@ -74,6 +78,7 @@
             pics : [] ,                              //图片集合
             goodData : {
                 name : "" ,                         //商品名称
+                sub_name : "" ,                     //副标题
                 price : "" ,                        //商品价格
                 stock : "" ,                        //商品库存
                 describe : "" ,                         //描述
@@ -81,6 +86,7 @@
                 pics : []                           //图片集合
             }
         }
+        mixins = [HttpOrigin];
         components = {
             local : Local
         };
@@ -149,36 +155,37 @@
                 const _this = this;
                 let goodData = this.goodData;
                 if( !Boolean( goodData.name ) ) {
-                    wx.showToast({ title : "需要填写名称" , icon : "none" });
+                    _this.toast("需要填写名称");
                     return;
                 }
                 if( !Boolean( goodData.price ) ) {
-                    wx.showToast({ title : "需要填写价格" , icon : "none" });
+                    _this.toast("需要填写价格");
                     return;
                 }
                 if( !Boolean( goodData.stock ) ) {
-                    wx.showToast({ title : "需要填写库存" , icon : "none" });
+                    _this.toast("需要填写库存");
                     return;
                 }
                 if( !Boolean( goodData.user_local_id ) ) {
-                    wx.showToast({ title : "需要选择发货地址" , icon : "none" });
+                    _this.toast("需要选择发货地址");
                     return;
                 }
                 if( !_this.pics[0] ) {
-                    wx.showToast({ title : "至少选择一张图片" , icon : "none" });
+                    _this.toast("至少选择一张图片");
                     return;
                 }
-                wx.showLoading("加载中...");
+                _this.goodData.pics = [];
+                this.showLoading();
                 let dt1 = await this.uploadPic();
                 let dt2 = await this.saveData();
                 switch( dt2.code ) {
                     case 200 :
-                        wx.showToast({ title : "发布成功" , icon : "none" });
+                        _this.succToast("发布成功");
                         break;
                     default :
-                        wx.showToast({ title :data.msg , icon : "none"  } );
+                        _this.succToast( data.msg );
                 }
-                wx.hideLoading();
+                _this.hideLoading();
             } ,
 
             /*
