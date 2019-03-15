@@ -23,12 +23,12 @@
             i{ font-size:20px; float: right; margin-top: 7px; color: #666; }
         }
     }
-    .logout{ width: 90%; height: 80rpx; margin: 10px auto 0; border-radius: 10rpx; line-height: 80rpx; background: #478c1e; color: #fff; text-align: center; }
+    .logout{ width: 96%; height: 80rpx; margin: 10px auto 0; border-radius: 10rpx; line-height: 80rpx; background: #478c1e; color: #fff; text-align: center; }
 </style>
 <template>
     <view class="content">
         <view class="head flex flex_align flex_just">
-            <label class="user-img" @tap="goTo('../pages/user-info')">
+            <label class="user-img flex flex_align flex_just" @tap="goTo('../pages/user-info')">
                 <image src="{{ userInfo.avatar }}" style="width: 100%; height: 100%; border-radius: 50%; background: #ccc;"></image>
                 <!--<open-data type="userAvatarUrl" style="display: block"></open-data>-->
             </label>
@@ -42,15 +42,15 @@
 
         </view>
         <view class="data">
-            <label @tap="goTo('../pages/user-phone')">
+            <label @tap="goTo('/pages/user-phone')">
                 <text>手机号</text>
                 <i class="fa fa-angle-right"></i>
             </label>
-            <label @tap="goTo('../pages/user-location')">
+            <label @tap="goTo('/pages/user-location')">
                 <text>地址管理</text>
                 <i class="fa fa-angle-right"></i>
             </label>
-            <label>
+            <label @tap="goTo('/pages/order')">
                 <text>我的订单</text>
                 <i class="fa fa-angle-right"></i>
             </label>
@@ -58,8 +58,8 @@
                 <text>足迹</text>
                 <i class="fa fa-angle-right"></i>
             </label>
-            <label>
-                <text>仓库</text>
+            <label @tap="goTo('/pages/storehouse')">
+                <text>我发布的商品</text>
                 <i class="fa fa-angle-right"></i>
             </label>
         </view>
@@ -69,6 +69,9 @@
 </template>
 <script>
     import wepy from "wepy";
+    import HttpOrigin from "@/mixins/httpOrigin";
+
+
 
     export default class User extends wepy.component {
         data = {
@@ -79,6 +82,7 @@
                 this.userInfo = result;
             }
         }
+        mixins = [HttpOrigin];
         watch = {
             "userInfo" : () => {
                 console.log("监听用户信息")
@@ -95,41 +99,38 @@
                 })
             } ,
             goTo( url ) {
-                console.log( url )
-                wx.navigateTo({
-                    url : url
-                });
+                this.pageTo( url );
             } ,
             async logout(){
-                let confirm = await this.confirmQuit();
+                const _this = this;
+                let confirm = await this.confirmModal("确认退出吗？");
                 if( confirm == "ok" ) {
                     wepy.request({
-                        url : "http://localhost:8999/user/logout.json" ,
+                        url : `${this.httpOrigin}/user/logout.json` ,
                         success : res => {
-                            wx.navigateTo({
-                                url : "/pages/index"
-                            });
+                            wx.clearStorageSync();
+                            _this.pageTo("/pages/index");
                         }
                     });
                 }
             }
         }
-        confirmQuit(){
-            return new Promise(( resolve , reject ) => {
-                wx.showModal({
-                    title: "提示",
-                    content: "确认退出吗？",
-                    success( res ) {
-                        if ( res.confirm ) {
-                            wx.clearStorageSync();
-                            resolve( "ok" );
-                        } else if ( res.cancel ) {
-                            resolve("cancel");
-                        }
-                    }
-                })
-            })
-        }
+        // confirmQuit(){
+        //     return new Promise(( resolve , reject ) => {
+        //         wx.showModal({
+        //             title: "提示",
+        //             content: "确认退出吗？",
+        //             success( res ) {
+        //                 if ( res.confirm ) {
+        //                     wx.clearStorageSync();
+        //                     resolve( "ok" );
+        //                 } else if ( res.cancel ) {
+        //                     resolve("cancel");
+        //                 }
+        //             }
+        //         })
+        //     })
+        // }
         onLoad(){
             //console.log("user load")
             //this.userInfo = this.$root.$parent.globalData.userInfo;

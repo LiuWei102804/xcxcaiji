@@ -2,6 +2,14 @@
     @import "../static/flex";
     @import "../static/font-awesome";
 
+
+    .small-title{
+        padding: 0 2%;
+        font-size: x-small;
+        height: 50rpx;
+        line-height: 50rpx;
+        margin-top: 20rpx;
+    }
     .search{ width: 96%; padding: 5px 2%;  background: #fff; margin: 0rpx 0 5px; font-size: 13px; position: relative;
         input{ width: 72%; display: block; height: 30px; border-radius: 15px; border: 1px solid #ccc; margin: 0 auto; padding: 0 10% 0 8%; font-size: 13px; }
         input::placeholder{ font-size: 12px;}
@@ -11,9 +19,10 @@
         a{ color: #01AAED; font-size: 12px; }
     }
     .location-other{
-        width: 96%; line-height: 60rpx; padding: 10px 2%; background: #fff; display: block; overflow: hidden; margin-bottom: 5px;
-        text{ background: #d3d3d3; padding: 3px 5px; margin-right: 5px; border-radius: 5px; color: #333; margin-bottom: 3px; display: block; float: left; }
+        width: 96%; line-height: 50rpx; padding: 10px 2%; background: #fff; display: block; overflow: hidden; margin-bottom: 5px;
+        text{ background: #d3d3d3; padding: 1px 3px; margin-right: 5px; border-radius: 5px; color: #333; margin-bottom: 5px; display: block; float: left; font-size: 12px; }
     }
+
     .panel {
         width: 96%;
         margin-top: 20rpx;
@@ -34,27 +43,35 @@
         <input type="text" confirm-type="search" @confirm="search" data-name="keyword" value="{{ keyword }}" @input="setInput" placeholder="输入地址查询" />
         <i class="fa fa-microphone"></i>
     </view>
+    <view class="small-title">当前定位：</view>
     <view class="location-item flex">
-        <text>{{ location.formatted_address }}</text>
-        <a>重新定位</a>
+        <text @tap="setLocation">{{ location.formatted_address }}</text>
+        <a @tap="resetPosition">重新定位</a>
     </view>
-    <view class="panel">周边</view>
-    <view class="location-other">
+
+    <view class="small-title">周边：</view>
+    <view class="location-other" wx:if="{{ location.pois > 0 }}">
         <text>中行天盛广场</text>
         <text>中行天盛广场</text>
         <text>中行天盛广场</text>
         <text>中行天盛广场</text>
         <text>中行天盛广场</text>
     </view>
-    <view class="panel">历史记录</view>
-    <view style="text-align: center; background: #fff; padding-bottom: 5px;">
+    <view class="location-other" wx:if="{{ location.pois == 0 }}" style="color: #333;">
+        <i class="fa fa-warning">暂无数据</i>
+    </view>
+    <view class="small-title" wx:if="{{ !Boolean(keyword) }}">历史记录：</view>
+    <view style="text-align: center; background: #fff; padding-bottom: 5px;" wx:if="{{ searchHistory.length > 0 }}">
         <view class="location-other">
             <repeat for="{{searchHistory}}" item="item">
-                <text>{{ item.word }}</text>
+                <text @tap="search({{ { detail : { value :item.word  } } }})">{{ item.word }}</text>
             </repeat>
 
         </view>
-        <i class="fa fa-trash">清除记录</i>
+        <i class="fa fa-trash" @tap="clearHistory">清除记录</i>
+    </view>
+    <view class="location-other" wx:if="{{ searchHistory.length == 0 }}" style="color: #333;">
+        <i class="fa fa-warning">暂无数据</i>
     </view>
 
 </template>
@@ -63,15 +80,24 @@
     import HttpOrigin from "@/mixins/httpOrigin";
     import Panel from "@/components/panel";
 
+
     export default class GuessLocation extends wepy.page{
         data = {
-            location : {} ,
+            location : {
+                pois : []
+            } ,
             keyword : "" ,
-            searchHistory : []
+            searchHistory : [] ,
+            searchResult : []
+        }
+        events = {
+            "newsearch" : word => {
+                this.getSearchHistory();
+            }
         }
         mixins = [HttpOrigin];
         components = {
-            panel: Panel
+            //index : Index ,
         }
         methods = {
             /*
@@ -84,29 +110,70 @@
             /*
             *   搜索
             * */
-            search(){
+            search( evt ){
+                this.keyword = evt.detail.value;
+                if( this.keyword ) {
+                    let url = `/pages/search-location?word=${this.keyword}`;
+                    this.pageTo( url );
+                }
+            } ,
+            /*
+            *   选择当前地址
+            * */
+            setLocation(){
+                wx.setStorageSync("position" , this.location.formatted_address );
+                wx.navigateBack({delta : 1});
+            } ,
+            /*
+            *   重新定位
+            * */
+            resetPosition(){
+                // const _this = this;
+                // wx.getLocation({
+                //     altitude : true ,
+                //     success : location => {
+                //         _this.changeLocation([location.latitude,location.longitude]);
+                //     } ,
+                //     fail : err => {
+                //     } ,
+                //     complete : () => {
+                //     }
+                // })
+                this.getLocation();
+            } ,
+            /*
+            *   清除历史记录
+            * */
+            clearHistory(){
                 const _this = this;
+                wx.showLoading({
+                    title : "加载中..."
+                });
                 wepy.request({
-                    url : `${_this.httpOrigin}/position/search.json` ,
-                    method : "POST" ,
-                    data : {
-                        word : _this.keyword
-                    } ,
+                    url : `${_this.httpOrigin}/user/clearHistory.json` ,
+                    method : "GET" ,
                     success : d => {
                         let data = d.data;
-                        console.log( data )
+                        switch( data.code ) {
+                            case 200 :
+                                _this.searchHistory = [];
+                                _this.$apply();
+                                break;
+                            default :
+                        }
                     } ,
                     complete : () => {
-                        _this.getSearchHistory();
+                        wx.hideLoading();
                     }
                 })
             }
-        }
+        };
         /*
         *   逆地理编码
         * */
         changeLocation( axis ){
             const _this = this;
+            wx.showLoading("加载中...");
             wepy.request({
                 url : `${_this.httpOrigin}/position/getLocation.json?lon=${axis[1]}&lat=${axis[0]}` ,
                 method : "GET" ,
@@ -119,10 +186,26 @@
                             break;
                         default :
                     }
+                } ,
+                complete : () => {
+                    wx.hideLoading();
                 }
             })
         }
 
+        getLocation(){
+            const _this = this;
+            wx.getLocation({
+                altitude : true ,
+                success : location => {
+                    _this.changeLocation([location.latitude,location.longitude]);
+                } ,
+                fail : err => {
+                } ,
+                complete : () => {
+                }
+            })
+        }
         /*
         *   获取搜索历史
         * */
@@ -135,20 +218,25 @@
                     let data = d.data;
                     switch( data.code ) {
                         case 200 :
-                            _this.searchHistory = data.result.keywords;
+                            try{
+                                _this.searchHistory = data.result.keywords;
+                            } catch ( e ) {
+                                _this.searchHistory = [];
+                            }
+
                             _this.$apply();
                             break;
                         default :
                     }
-                    console.log( data )
                 }
             });
         };
         onLoad( params ){
-            if( params.statu == "success" ) {
-                let axis = params.result.split(",");
-                this.changeLocation( axis );
-            }
+            // if( params.statu == "success" ) {
+            //     let axis = params.result.split(",");
+            //     this.changeLocation( axis );
+            // }
+            this.getLocation();
             this.getSearchHistory();
         }
         onShow(){

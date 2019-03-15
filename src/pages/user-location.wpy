@@ -15,18 +15,24 @@
 </style>
 <template>
     <scroll-view scroll-y style="height:{{ scrollHeight }}px">
-        <repeat for="{{ locationList }}" item="item">
-            <view class="flex location flex_just">
-                <label class="location-data">
-                    <view>
-                        <a>{{ item.user_real_name }}</a>
-                        <a>{{ item.phone }}</a>
-                    </view>
-                    <text>{{ item.street }}</text>
-                </label>
-                <i class="edit fa fa-edit" @tap="toAddLocation"></i>
-            </view>
-        </repeat>
+        <view wx:if="{{ locationList.length > 0 }}">
+            <repeat for="{{ locationList }}" item="item">
+                <view class="flex location flex_just">
+                    <label class="location-data">
+                        <view>
+                            <a>{{ item.user_real_name }}</a>
+                            <a>{{ item.phone }}</a>
+                        </view>
+                        <text>{{ item.street }}</text>
+                    </label>
+                    <i class="edit fa fa-edit" @tap="toAddLocation"></i>
+                </view>
+            </repeat>
+        </view>
+        <view wx:if="{{ locationList.length == 0 }}">
+            <empty></empty>
+        </view>
+
     </scroll-view>
 
     <a class="add-btn" @tap="toAddLocation()">新增地址</a>
@@ -34,6 +40,8 @@
 </template>
 <script>
     import wepy from "wepy";
+    import Empty from "@/components/empty";
+    import HttpOrigin from "@/mixins/httpOrigin";
     import { WINHEIGHT , RPX } from "../util/info";
 
 
@@ -49,8 +57,9 @@
             }
         }
         components = {
-
+            empty : Empty
         }
+        mixins = [HttpOrigin];
         methods = {
             toAddLocation : () => {
                 wx.navigateTo({

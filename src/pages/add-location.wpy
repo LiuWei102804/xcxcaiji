@@ -27,7 +27,7 @@
     </label>
     <label class="location-add-item">
         <text>电话：</text>
-        <input type="tel" data-name="phone" @input="setInput" placeholder="请输入电话" maxlength="11" />
+        <input type="tel" value="{{ locationData.phone }}" data-name="phone" disabled placeholder="请输入电话" maxlength="11" />
     </label>
     <view class="location-add-item">
         <text>省：</text>
@@ -248,6 +248,8 @@
             })
         }
         onLoad(){
+            console.log( wx.getStorageSync("userInfo") )
+            this.locationData.phone = wx.getStorageSync("userInfo").account;
             this.queryLocationData();
         }
 

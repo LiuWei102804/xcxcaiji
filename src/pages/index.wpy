@@ -21,10 +21,10 @@
     import Shop from "../components/shop";
     import Foot from "../components/foot";
     import BindPhone from "../components/bind-phone";
-    import UserInfo from "../mixins/httpOrigin";
+    import HttpOrigin from "@/mixins/httpOrigin";
     import { WINHEIGHT , RPX } from "../util/info";
 
-    export default class Index2 extends wepy.page {
+    export default class Index extends wepy.page {
         constructor(){
             super();
         }
@@ -35,7 +35,7 @@
             foot : Foot ,
             bindphone : BindPhone
         }
-        mixins = [UserInfo];
+        mixins = [HttpOrigin];
         data = {
             tabActive : 0 ,
             scrollHeight : 0 ,
@@ -45,40 +45,64 @@
 
         }
         watch = {
-
+            "tabActive" : ( newVal , oldVal ) => {
+            }
         }
         events = {
             "tab" : ( index ) => {
+                switch( Number( index ) ) {
+                    case 0 :
+                        this.$invoke("home","hotProducts");
+                        break;
+                    case 1 :
+                        this.$invoke("shop","shopCarData");
+                        break;
+                    case 2 :
+                        //this.$invoke("user","shopCarData");
+                        break;
+                }
                 this.tabActive = index;
             } ,
             "customHide" : ( data ) => {
                 this.isLogin = true;
-                this.$broadcast("login", data );
+                if( !Boolean( wx.getStorageSync("position") ) ) {
+                    console.log(11111)
+                    let url = `/pages/guess-location`;
+                    this.pageTo( url );
+                }
+                //this.$broadcast("login", data );
             }
         }
-        onLoad() {
+        onLoad( params ) {
             this.autoLogin();
         }
         onShow(){
-
-
+            let posiStorage = wx.getStorageSync("position");
+            if( posiStorage ) {
+                this.$broadcast("position", posiStorage );
+            };
         }
         autoLogin(){
             let _this = this;
             wx.showLoading("加载中...");
             wepy.request({
-                url: "http://localhost:8999/user/isLogin.json",
+                url: `${this.httpOrigin}/user/isLogin.json`,
                 method : "GET" ,
                 success : function ( data ) {
                     switch( data.data.code ) {
                         case 200 :
+                            if( !Boolean( wx.getStorageSync("position") ) ) {
+                                let url = `/pages/guess-location`;
+                                _this.pageTo( url );
+                            }
+
                             _this.$broadcast("login", data.data.result );
                             wx.setStorageSync("userInfo" , data.data.result );
                             break;
                         default :
                             _this.isLogin = false;
                             _this.$apply();
-                            wx.showToast({ title :data.data.msg , icon : "none"  } );
+                            _this.toast( data.data.msg );
                     }
 
                 } ,

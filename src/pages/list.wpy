@@ -48,10 +48,8 @@
                         .price{ color: red;
                             text{ font-size: 14px; }
                         }
-                        .user{
-                            i{
-                                margin-right: 5px;
-                            }
+                        view{
+                            image{ width: 46rpx; height: 46rpx; border-radius: 50%; margin-right: 5px; }
                         }
                     }
 
@@ -82,24 +80,27 @@
                     <i class="fa fa-sort-down"></i>
                 </b>
             </a>
-            <a href="javacript:void(0)" class="flex flex_just flex_align">
-                距离
-                <b>
-                    <i class="fa fa-sort-up"></i>
-                    <i class="fa fa-sort-down"></i>
-                </b>
-            </a>
+            <!--<a href="javacript:void(0)" class="flex flex_just flex_align">-->
+                <!--距离-->
+                <!--<b>-->
+                    <!--<i class="fa fa-sort-up"></i>-->
+                    <!--<i class="fa fa-sort-down"></i>-->
+                <!--</b>-->
+            <!--</a>-->
         </nav>
         <view class="data">
             <repeat for="{{ list }}" item="item">
-                <view class="hot flex flex_align">
-                    <image src="{{ item.goodUrl }}"></image>
+                <view class="hot flex flex_align" @tap="detail({{ item }})">
+                    <image src="{{ item.pics[0] }}"></image>
                     <label class="flex">
                         <text class="text">{{ item.name }}</text>
                         <view class="other flex flex_align">
-                            <text class="price">￥<text>{{ item.price }}</text></text>
-                            <a class="user"><i class="fa fa-user-circle"></i>{{ item.author }}</a>
-                            <a class="long">{{ item.long }}</a>
+                            <view class="price">￥<text>{{ item.price }}</text></view>
+                            <!--<a class="user"><i class="fa fa-user-circle"></i>{{ item.author }}</a>-->
+                            <view class="flex flex_align">
+                                <image src="{{ item.seller.avatar }}"></image>
+                                <text>{{ item.seller.nick_name }}</text>
+                            </view>
                         </view>
                     </label>
                 </view>
@@ -110,15 +111,58 @@
 </template>
 <script>
     import wepy from "wepy";
+    import HttpOrigin from "@/mixins/httpOrigin";
 
     export default class List extends wepy.page{
         data = {
             list : [
-                { price : 10999.00 , long : "100m" , author : "黄贱贱2元店" , name : "Apple iPhone XS Max (A2104) 256GB 深空灰色 移动联通电信4G手机 双卡双待" , goodUrl : "../images/yu.jpg" } ,
-                { price : 2798.00 , long : "100m" , author : "黄贱贱2元店" , name : "vivo X23全息幻彩版 6GB+128GB 北极晨曦 水滴屏全面屏 游戏手机 移动联通电信全网通4G手机" , goodUrl : "../images/yu2.jpg" } ,
-                { price : 2199.00 , long : "300m" , author : "黄贱贱2元店" , name : "荣耀10 GT游戏加速 AIS手持夜景 6GB+64GB 幻夜黑 全网通 移动联通电信4G 双卡双待 游戏手机" , goodUrl : "../images/yu3.jpg" } ,
-                { price : 2949.00 , long : "800m" , author : "造船的小店" , name : "一加手机6 8GB+128GB 亮瓷黑 高通骁龙845 全面屏双摄游戏手机 全网通4G 双卡双待" , goodUrl : "../images/yu4.jpg" }
-            ]
+            ] ,
+            params : {
+                offset : 0 ,
+                limit : 10
+            }
+        }
+        mixins = [HttpOrigin];
+        methods = {
+            detail( item ){
+                let url = `/pages/good?id=${item._id}&userId=${item.user_id}`;
+                this.pageTo(url);
+            }
+        }
+        /*
+        *   查询所有商品
+        * */
+        queryAll( params ){
+            const _this = this;
+
+            _this.showLoading();
+            wepy.request({
+                url : `${this.httpOrigin}/product/getProductByLimit.json` ,
+                method : "GET" ,
+                data : params ,
+                success : ( d )=> {
+                    let { data } = d;
+                    switch( data.code ) {
+                        case 200 :
+                            _this.list = _this.list.concat( data.result );
+                            _this.$apply();
+                            break;
+                        default :
+                    }
+                } ,
+                error : e => {
+
+                } ,
+                complete : () => {
+                    _this.hideLoading();
+                }
+            })
+        }
+        onShow(){
+
+        }
+        onLoad(){
+            this.queryAll();
         }
     }
 </script>

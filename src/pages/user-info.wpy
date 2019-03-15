@@ -47,7 +47,7 @@
     <label class="user_item flex">
         <text>手机号：</text>
         <input type="text" placeholder="" value="{{ userInfo.account }}" disabled @input="setInput" />
-        <i class="fa fa-angle-right"></i>
+        <!--<i class="fa fa-angle-right"></i>-->
     </label>
     <a class="add-btn" @tap="save">保存</a>
 
