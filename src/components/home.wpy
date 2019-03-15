@@ -203,7 +203,7 @@
             let status = "";
             let result = null;
             wx.getLocation({
-                altitude : false ,
+                altitude : true ,
                 success : location => {
                     console.log( location )
                     result = `${location.latitude},${location.longitude}`;
