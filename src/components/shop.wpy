@@ -299,9 +299,9 @@
                 success : d => {
                     let data = d.data;
                     if( data.result ) {
-                        _this.shopCar = data.result;
+                       // _this.shopCar = data.result;
                     } else {
-                        _this.shopCar = { shopcar_goods : [] };
+                       // _this.shopCar = { shopcar_goods : [] };
                     }
                     _this.$apply();
                 } ,
