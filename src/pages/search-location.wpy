@@ -1,0 +1,73 @@
+<style lang="less">
+    @import "../static/flex";
+    @import "../static/font-awesome";
+
+
+
+    .search-list{ padding: 5px 2%; width: 96%; height: auto; background: #fff; margin-top: 10rpx;
+        .result{ display: flex; font-size: 12px; border-bottom: 1px solid #ccc; line-height: 80rpx; height: 80rpx; color: #666; justify-content: space-between; -webkit-justify-content: space-between; font-weight: bolder;
+            small{ color: #478c1e; font-size: x-small; font-weight: normal; }
+        }
+        .nodata{
+            text-align: center;
+            line-height: 200rpx;
+            height: 200rpx;
+            font-size: 12px;
+            color: #666;
+        }
+    }
+</style>
+<template>
+    <view class="search-list" wx:if="{{searchResult.length > 0}}">
+        <repeat for="{{ searchResult }}" item="item">
+            <view class="result" @tap="setLocation({{ item }})"><text>{{ item.name }}</text>  <small>{{ item.district }}</small></view>
+        </repeat>
+    </view>
+    <view class="search-list" wx:if="{{searchResult.length == 0}}">
+        <view class="nodata"><i class="fa fa-warning" style="font-size: 16px;"></i>暂无数据</view>
+    </view>
+</template>
+<script>
+    import wepy from "wepy";
+    import HttpOrigin from "@/mixins/httpOrigin";
+
+
+
+    export default class SearchLocation extends wepy.page{
+        data = {
+            searchResult : []
+        }
+        mixins = [HttpOrigin];
+        methods = {
+            setLocation( item ) {
+                wx.setStorageSync("position" , item.name );
+                wx.navigateBack({delta : getCurrentPages().length });
+            }
+        }
+        search( word ){
+            const _this = this;
+            wx.showLoading({
+                title : "加载中..."
+            });
+            wepy.request({
+                url : `${_this.httpOrigin}/position/search.json` ,
+                method : "POST" ,
+                data : {
+                    word : word
+                } ,
+                success : d => {
+                    let data = d.data;
+                    _this.searchResult = data.result.result;
+                    _this.$apply();
+                    _this.$emit("newsearch" , word );
+                } ,
+                complete : () => {
+                    wx.hideLoading();
+                }
+            })
+        }
+        onLoad( params ){
+            this.search( params.word );
+        }
+    }
+</script>

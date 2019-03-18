@@ -1,0 +1,118 @@
+<style lang="less">
+    @import "../static/flex";
+    @import "../static/font-awesome";
+
+
+    .more{ margin-top: 10px; background: #fff; padding: 10px 2%;
+        .other{ width: 100%; height: auto; overflow: hidden;
+            label{
+                width: 46%; height: auto; display: block; float: left; padding: 5px 2%; margin-bottom: 10px;
+                image{ width: 100%; height:300rpx; }
+                .name{ font-size: 12px; color: #666; line-height: 14px; height: 28px; overflow: hidden; max-width: 100%;text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; }
+                .stock{ color: #999; font-size: x-small; margin: 10rpx 0; justify-content: space-between; -webkit-justify-content: space-between; }
+                .price{ color: red; font-size: 12px; justify-content: space-between; -webkit-justify-content: space-between; margin-top: 10rpx;
+                    text{ font-size: 14px;  }
+                    i{ color: #666; font-size: 16px; }
+
+                }
+            }
+        }
+    }
+
+</style>
+<template>
+    <view class="content">
+        <view wx:if="{{goods.length > 0}}" class="more">
+            <view class="other">
+                <repeat for="{{ goods }}" item="item">
+                    <label @tap="loadGood({{ item }})">
+
+                        <image src="{{ item.pics[0] }}"></image>
+                        <text class="name">{{ item.name }}</text>
+                        <view class="flex stock">
+                            <text>已售:0</text>
+                            <text>浏览:0</text>
+                            <text>库存:0</text>
+                        </view>
+                        <view class="price flex flex_align">
+                            <a>￥<text>{{ item.price }}</text></a>
+                            <i class="fa fa-edit"></i>
+                        </view>
+                    </label>
+                </repeat>
+            </view>
+        </view>
+        <view wx:if="{{goods.length == 0}}">
+            <empty></empty>
+        </view>
+    </view>
+</template>
+<script>
+    import wepy from "wepy";
+    import Empty from "@/components/empty";
+    import httpOrigin from "@/mixins/httpOrigin";
+
+
+    export default class StoreHouse extends wepy.page{
+        constructor(){
+            super();
+        }
+        components = {
+            empty : Empty
+        }
+        mixins = [httpOrigin];
+        data = {
+            goods : [] ,
+            params : {
+                offset : 0 ,
+                limit : 10 ,
+                userId : ""
+            }
+        }
+        events = {
+
+        }
+        methods = {
+            /*
+            *   查看单品
+            * */
+            loadGood(){
+
+            }
+        }
+        queryHasGood( params ){
+            const _this = this;
+
+            _this.showLoading();
+            wepy.request({
+                url : `${this.httpOrigin}/product/getProductByUser.json` ,
+                method : "GET" ,
+                data : params ,
+                success : d => {
+                    let data = d.data;
+                    switch ( data.code ) {
+                        case 200 :
+                            _this.goods = this.goods.concat( data.result );
+                            _this.$apply();
+                            break;
+                        default :
+
+                    }
+                } ,
+                error : e => {
+
+                } ,
+                complete : () => {
+                    _this.hideLoading();
+                }
+            })
+        }
+        onLoad(){
+            this.params.userId = wx.getStorageSync("userInfo")._id;
+            this.queryHasGood( this.params );
+        }
+        onShow(){
+
+        }
+    }
+</script>

@@ -1,0 +1,33 @@
+<style lang="less">
+    .empty{
+        padding: 10rpx 3%;
+        width: 94%;
+        height: 200rpx;
+        background: #fff;
+        margin-top: 10rpx;
+        display: flex;
+        display: -webkit-flex;
+        justify-content: center;
+        -webkit-justify-content: center;
+        align-items: center;
+        -webkit-align-items: center;
+    }
+</style>
+<template>
+    <view class="empty">
+        <i class="fa fa-warning">暂无数据</i>
+    </view>
+</template>
+<script>
+    import wepy from "wepy";
+
+
+    export default class Empty extends wepy.component{
+        data = {
+
+        }
+        onLoad(){
+
+        }
+    }
+</script>
