@@ -2,13 +2,18 @@
     @import "../static/font-awesome";
     @import "../static/flex";
 
-    .search{ width: 96%; padding: 5px 2%;  background: #fff; margin:0 0 5px 0; font-size: 13px; position: relative;
+
+    page{
+        overflow: hidden;
+        height: 100%;
+    }
+    .search{ width: 96%; padding: 0px 2%;  background: #fff; margin:0 0 5px 0; font-size: 13px; position: relative; height: 7.5%;
         input{ width: 72%; display: block; height: 30px; border-radius: 15px; border: 1px solid #ccc; margin: 0 auto; padding: 0 10% 0 8%; font-size: 13px; }
         input::placeholder{ font-size: 12px;}
-        i{ position: absolute; font-size: 17px; right:10%; top:27%; color: #999; }
+        i{ position: absolute; font-size: 17px; right:10%; top:14%; color: #999; }
     }
     .list{
-        width: 100%; height: 100%; overflow: auto;
+        width: 100%; height: calc(93% - 5px); overflow: hidden;
         nav{ width: 100%; height: 80rpx; line-height: 80rpx; background: #fff;
             a{ flex: 1; -webkit-flex: 1; text-align: center;
                 b{ flex-direction: column; -webkit-flex-direction: column; margin-left: 10rpx; position: relative; height: 30rpx; width: 30rpx;
@@ -88,25 +93,27 @@
                 <!--</b>-->
             <!--</a>-->
         </nav>
-        <view class="data">
-            <repeat for="{{ list }}" item="item">
-                <view class="hot flex flex_align" @tap="detail({{ item }})">
-                    <image src="{{ item.pics[0] }}"></image>
-                    <label class="flex">
-                        <text class="text">{{ item.name }}</text>
-                        <view class="other flex flex_align">
-                            <view class="price">￥<text>{{ item.price }}</text></view>
-                            <!--<a class="user"><i class="fa fa-user-circle"></i>{{ item.author }}</a>-->
-                            <view class="flex flex_align">
-                                <image src="{{ item.seller.avatar }}"></image>
-                                <text>{{ item.seller.nick_name }}</text>
-                            </view>
-                        </view>
-                    </label>
-                </view>
-            </repeat>
 
-        </view>
+        <scroll-view scroll-y lower-threshold="10" @scrolltolower="scrolltolower" style="height: calc(100% - 80rpx)">
+            <view class="data">
+                <repeat for="{{ list }}" item="item">
+                    <view class="hot flex flex_align" @tap="detail({{ item }})">
+                        <image src="{{ item.pics[0] }}"></image>
+                        <label class="flex">
+                            <text class="text">{{ item.name }}</text>
+                            <view class="other flex flex_align">
+                                <view class="price">￥<text>{{ item.price }}</text></view>
+                                <!--<a class="user"><i class="fa fa-user-circle"></i>{{ item.author }}</a>-->
+                                <view class="flex flex_align">
+                                    <image src="{{ item.seller.avatar }}"></image>
+                                    <text>{{ item.seller.nick_name }}</text>
+                                </view>
+                            </view>
+                        </label>
+                    </view>
+                </repeat>
+            </view>
+        </scroll-view>
     </view>
 </template>
 <script>
@@ -127,6 +134,13 @@
             detail( item ){
                 let url = `/pages/good?id=${item._id}&userId=${item.user_id}`;
                 this.pageTo(url);
+            } ,
+            /*
+            *   滚动到底部
+            * */
+            scrolltolower(){
+                this.params.offset += this.params.limit;
+                this.queryAll( this.params );
             }
         }
         /*

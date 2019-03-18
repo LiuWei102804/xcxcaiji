@@ -74,6 +74,12 @@
             }
         }
         onLoad( params ) {
+            //throw new Error("出错啦");
+
+
+            // wx.onError(( e ) => {
+            //     console.error("app error at " , e );
+            // })
             this.autoLogin();
         }
         onShow(){
