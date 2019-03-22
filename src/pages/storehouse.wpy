@@ -30,13 +30,13 @@
                         <image src="{{ item.pics[0] }}"></image>
                         <text class="name">{{ item.name }}</text>
                         <view class="flex stock">
-                            <text>已售:0</text>
-                            <text>浏览:0</text>
-                            <text>库存:0</text>
+                            <text>已售:{{ item.sales_volume }}</text>
+                            <text>浏览:{{ item.browse_count }}</text>
+                            <text>库存:{{ item.stock }}</text>
                         </view>
                         <view class="price flex flex_align">
                             <a>￥<text>{{ item.price }}</text></a>
-                            <i class="fa fa-edit"></i>
+                            <i class="fa fa-edit" @tap="modifyItem({{ item }})"></i>
                         </view>
                     </label>
                 </repeat>
@@ -78,6 +78,12 @@
             * */
             loadGood(){
 
+            } ,
+            /*
+            *   更新商品
+            * */
+            modifyItem( item ){
+                this.pageTo("/pages/publish?id=" + item._id );
             }
         }
         queryHasGood( params ){
@@ -92,6 +98,7 @@
                     let data = d.data;
                     switch ( data.code ) {
                         case 200 :
+                            console.log( data.result )
                             _this.goods = this.goods.concat( data.result );
                             _this.$apply();
                             break;

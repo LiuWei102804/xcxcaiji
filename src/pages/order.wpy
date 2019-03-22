@@ -2,12 +2,15 @@
     @import "../static/flex";
     @import "../static/font-awesome";
 
+    page{
+        height: 100%;
+    }
     .nav{ width: 100%; height: 80rpx; line-height: 80rpx;background: #fff; justify-content: space-around; -webkit-justify-content: center; box-shadow: 0px 1px 10px 0px #478c1e;  }
     .nav a{ flex: 1; -webkit-flex: 1; text-align: center; }
     .nav a.active{ background: #478c1e; color: #fff; font-size: 30rpx; font-weight: bolder; }
 
-    .list{ width: 94%; height: auto; padding: 20rpx 3%; background: #fff; margin-top: 30rpx;
-        .order-item{ width: 100%; height: auto; margin-bottom: 10rpx;
+    .list{ width:100%; height: auto; padding: 20rpx 0%; background: #eee; margin-top: 30rpx;
+        .order-item{ width:94%; height: auto; margin-bottom: 10px; background: #fff; padding: 0 3% 10px;
             .o-header{ justify-content: space-between; -webkit-justify-content: space-between; font-size: x-small; border-bottom: 1px solid #ddd; height: 80rpx; line-height: 80rpx;
                 text:last-child{ color: red; }
             }
@@ -30,44 +33,47 @@
     }
 </style>
 <template>
-    <view class="content">
+    <view class="content" style="height: 100%;">
         <view class="flex nav">
             <a href="javascript:void(0)" data-state="0" class="{{ queryParams.state == 0 ? 'active' : '' }}" @tap="changeTab(0)">全部</a>
             <a href="javascript:void(0)" data-state="1" class="{{ queryParams.state == 1 ? 'active' : '' }}" @tap="changeTab(1)">未支付</a>
             <a href="javascript:void(0)" data-state="2" class="{{ queryParams.state == 2 ? 'active' : '' }}" @tap="changeTab(2)">已支付</a>
             <a href="javascript:void(0)" data-state="3" class="{{ queryParams.state == 3 ? 'active' : '' }}" @tap="changeTab(3)">已取消</a>
         </view>
-        <view class="list" wx:if="{{orderList.length > 0}}">
-            <repeat for="{{orderList}}" item="item" index="index">
-                <view class="order-item">
-                    <view class="o-header flex">
-                        <text>订单号:{{item.order_num}}</text>
-                        <text>{{ item.state_remark }}</text>
-                    </view>
-                    <repeat for="{{item.goods}}" item="val" index="key">
-                        <view style="margin-top: 20rpx;">
-                            <view class="o-from flex">
-                                <view class="flex flex_align"><image src="{{ val.seller.avatar }}"></image>{{val.seller.nick_name}}</view>
-                                <i class="fa fa-angle-right"></i>
-                            </view>
-                            <view class="o-body flex">
-                                <image src="{{ val.pics[0] }}"></image>
-                                <view class="flex">{{ val.name }}</view>
-                            </view>
-                            <view style="text-align: right; margin:10rpx 0;"><i class="fa fa-rmb"></i>{{val.price}} <i class="fa fa-times"></i> {{val.count}}</view>
+        <scroll-view scroll-y style="height:calc(100% - 80rpx)">
+            <view class="list" wx:if="{{orderList.length > 0}}">
+                <repeat for="{{orderList}}" item="item" index="index">
+                    <view class="order-item">
+                        <view class="o-header flex">
+                            <text>订单号:{{item.order_num}}</text>
+                            <text>{{ item.state_remark }}</text>
                         </view>
-                    </repeat>
-                    <view class="o-total">共{{ item.goods.length }}件商品 实付款<b>{{item.order_price}}</b>元</view>
-                    <view class="o-footer flex">
-                        <i class="fa fa-trash-o" @tap="delItem({{ item }})"></i>
-                        <a>确认收货</a>
+                        <repeat for="{{item.goods}}" item="val" index="key">
+                            <view style="margin-top: 20rpx;">
+                                <view class="o-from flex">
+                                    <view class="flex flex_align"><image src="{{ val.seller.avatar }}"></image>{{val.seller.nick_name}}</view>
+                                    <i class="fa fa-angle-right"></i>
+                                </view>
+                                <view class="o-body flex">
+                                    <image src="{{ val.pics[0] }}"></image>
+                                    <view class="flex">{{ val.name }}</view>
+                                </view>
+                                <view style="text-align: right; margin:10rpx 0;"><i class="fa fa-rmb"></i>{{val.price}} <i class="fa fa-times"></i> {{val.count}}</view>
+                            </view>
+                        </repeat>
+                        <view class="o-total">共{{ item.goods.length }}件商品 实付款<b>{{item.order_price}}</b>元</view>
+                        <view class="o-footer flex" wx:if="{{item.state != 3}}">
+                            <i class="fa fa-trash-o" @tap="delItem({{ item }})"></i>
+                            <a wx:if="{{ item.state == 1 }}">支付</a>
+                            <a wx:if="{{ item.state == 2 }}">确认收货</a>
+                        </view>
                     </view>
-                </view>
-            </repeat>
-        </view>
-        <view class="list" wx:if="{{orderList.length == 0}}">
-            <empty></empty>
-        </view>
+                </repeat>
+            </view>
+            <view class="list" wx:if="{{orderList.length == 0}}">
+                <empty></empty>
+            </view>
+        </scroll-view>
     </view>
 </template>
 <script>
@@ -104,11 +110,12 @@
             async delItem( item ){
                 const _this = this;
                 let confirm = await this.confirmModal("确认取消并删除订单吗？");
+                console.log( item )
                 if( confirm == "ok" ) {
                     wepy.request({
                         url : `${this.httpOrigin}/order/delOrderById.json` ,
                         method : "GET" ,
-                        data : { orderId : 1111 } ,
+                        data : { orderId : item._id } ,
                         success : d => {
                             let data = d.data;
                             console.log( data )
@@ -116,7 +123,7 @@
                         error : e => {
 
                         } ,
-                        complete : () > {
+                        complete : () => {
 
                         }
                     })

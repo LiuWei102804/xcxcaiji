@@ -91,7 +91,7 @@
                                 </view>
                             </view>
                         </label>
-                        <view class="remove">删除</view>
+                        <view class="remove" @tap="delItem({{shopCar._id}},{{ item._id }})">移除</view>
                     </view>
                 </scroll-view>
             </repeat>
@@ -234,6 +234,7 @@
                     return;
                 };
                 let checks = _this.shopCar.shopcar_goods.filter( item => item.checked == true );
+                //let unCheck = _this.shopCar.shopcar_goods.filter( item => item.checked != true );
                 _this.showLoading();
                 wepy.request({
                     url : `${this.httpOrigin}/order/place.json` ,
@@ -245,7 +246,9 @@
                         let data = d.data;
                         switch ( data.code ) {
                             case 200 :
+                                //_this.shopCar.shopcar_goods = unCheck;
                                 _this.pageTo(`/pages/order`);
+                                //_this.$apply();
                                 break;
                             default :
                                 wx.showToast({ title : data.msg });
@@ -259,6 +262,37 @@
                     }
                 })
                 console.log( checks )
+            } ,
+            /*
+            *   移除购物车
+            * */
+            delItem( orderId , goodId ){
+                const _this = this;
+                _this.showLoading();
+                wepy.request({
+                    url : `${this.httpOrigin}/shop/remove.json` ,
+                    method : "GET" ,
+                    data : { orderId : orderId , goodId : goodId } ,
+                    success : d => {
+                        let data = d.data;
+                        switch( data.code ) {
+                            case 200 :
+                                let newData = _this.shopCar.shopcar_goods.filter(item => item._id != goodId);
+                                _this.shopCar.shopcar_goods = newData;
+                                _this.$apply();
+                                _this.toast( data.msg );
+                                break;
+                            default :
+                        }
+                    } ,
+                    error : e => {
+
+                    } ,
+                    complete : () => {
+                        _this.hideLoading();
+                    }
+                })
+                console.log( orderId , goodId )
             }
         }
         /*
@@ -299,9 +333,9 @@
                 success : d => {
                     let data = d.data;
                     if( data.result ) {
-                       // _this.shopCar = data.result;
+                        _this.shopCar = data.result;
                     } else {
-                       // _this.shopCar = { shopcar_goods : [] };
+                        _this.shopCar = { shopcar_goods : [] };
                     }
                     _this.$apply();
                 } ,

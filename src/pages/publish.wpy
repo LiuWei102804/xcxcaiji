@@ -25,19 +25,19 @@
 </style>
 <template>
     <label class="publish_item">
-        <input type="text" data-name="name" placeholder="请输入商品名称" @input="setInput" />
+        <input type="text" data-name="name" placeholder="请输入商品名称" @input="setInput" value="{{ goodData.name }}" />
     </label>
     <label class="publish_item">
-        <input type="text" data-name="sub_name" placeholder="请输入商品副标题" @input="setInput" />
+        <input type="text" data-name="sub_name" placeholder="请输入商品副标题" @input="setInput" value="{{ goodData.sub_name }}" />
     </label>
     <label class="publish_item">
-        <input type="number" data-name="price" placeholder="请输入商品价格" @input="setInput" />
+        <input type="number" data-name="price" placeholder="请输入商品价格" @input="setInput" value="{{ goodData.price }}" />
     </label>
     <label class="publish_item">
-        <input type="number" data-name="stock" placeholder="请输入商品库存" @input="setInput" />
+        <input type="number" data-name="stock" placeholder="请输入商品库存" @input="setInput" value="{{ goodData.stock }}" />
     </label>
     <label class="publish_item">
-        <input type="text" data-name="describe" placeholder="请输入商品描述" @input="setInput" />
+        <input type="text" data-name="describe" placeholder="请输入商品描述" @input="setInput" value="{{ goodData.describe }}" />
     </label>
     <label class="publish_item" style="border-bottom: none;">发货地址</label>
     <label class="publish_item" @tap="useLocal()">
@@ -60,7 +60,7 @@
         <local :locationList.sync="locationList"></local>
     </view>
 
-    <a class="publish_btn" @tap="publish()">发布</a>
+    <a class="publish_btn" @tap="publish()">{{product_state}}</a>
 </template>
 <script>
     import wepy from "wepy";
@@ -71,6 +71,7 @@
 
     export default class Publish extends wepy.page {
         data = {
+            product_state : "发布" ,
             locationList : [] ,
             count : 5 ,
             animationData : {} ,
@@ -137,7 +138,7 @@
                 this.animationData = animate().translate("0%","0").step();
                 await this.userLocation({ offset : 0 , limit : 10 });
 
-                console.log("地址信息查询到了")
+                //console.log("地址信息查询到了")
             } ,
             /*
             *   隐藏地址栏
@@ -287,8 +288,47 @@
                 }
             })
         }
-        onLoad(){
+        /*
+        *   单个商品查询
+        * */
+        getProductById( id ){
+            const _this = this;
+            this.showLoading();
+            wepy.request({
+                url : `${this.httpOrigin}/product/getProductById.json` ,
+                method : "GET" ,
+                data : {
+                    id : id
+                } ,
+                success : d => {
+                    let data = d.data;
+                    switch( data.code ) {
+                        case 200 :
+                            _this.goodData = data.result;
+                            _this.pics = data.result.pics;
+                            _this.$apply();
+                            console.log( data )
+                            break;
+                        default :
+                    }
+                } ,
+                error : e => {
 
+                } ,
+                complete : () => {
+                    _this.hideLoading();
+                }
+            })
+        }
+        onLoad( params ){
+            let { id } = params;
+            if( id ) {
+                this.product_state = "修改";
+                this.getProductById( id );
+            }
+        }
+        onShow(){
+            // console.log( this )
         }
     }
 </script>
