@@ -247,7 +247,7 @@
                         switch ( data.code ) {
                             case 200 :
                                 //_this.shopCar.shopcar_goods = unCheck;
-                                _this.pageTo(`/pages/order`);
+                                //_this.pageTo(`/pages/order`);
                                 //_this.$apply();
                                 break;
                             default :

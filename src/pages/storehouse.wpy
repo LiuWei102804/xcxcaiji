@@ -76,8 +76,8 @@
             /*
             *   查看单品
             * */
-            loadGood(){
-
+            loadGood( item ){
+                //this.pageTo("/pages/publish?id=" + item._id );
             } ,
             /*
             *   更新商品

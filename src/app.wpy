@@ -102,7 +102,10 @@ export default class extends wepy.app {
 
 
   }
-  onError( e ){
+    onUnload(){
+        wx.clearStorageSync();
+    }
+    onError( e ){
       console.log( "app error " )
   }
 
