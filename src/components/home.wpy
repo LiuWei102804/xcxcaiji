@@ -231,7 +231,6 @@
         /*
         *   获取位置信息
         * */
-<<<<<<< HEAD
         getLocation(){
             let status = "";
             let result = null;
@@ -252,7 +251,6 @@
                 }
             })
         }
-=======
         // getLocation(){
         //     const _this = this;
         //     let status = "";
@@ -274,7 +272,6 @@
         //         }
         //     })
         // }
->>>>>>> 27e27794e11cf461081f35ef1578623cff8828ad
         onLoad (){
             this.hotProducts();
         }
