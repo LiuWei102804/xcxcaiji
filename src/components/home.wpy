@@ -199,7 +199,8 @@
                 this.pageTo( url );
             } ,
             setInput( e ){
-                let attr = e.dataset.name;
+                let attr = e.target.dataset.name;
+
                 this[attr] =  e.detail.value;
             }
         }
